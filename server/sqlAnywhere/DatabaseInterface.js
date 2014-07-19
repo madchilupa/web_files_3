@@ -25,6 +25,7 @@ module.exports.dbResults = function(cmdString, callback) {
 			} else {
 				callback(result);
 			}
+			conn.disconnect();
 		});
 	});
 };

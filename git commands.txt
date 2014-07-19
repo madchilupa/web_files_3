@@ -1,0 +1,10 @@
+git pull - svn update
+git add . (or git add filename)
+git commit -m "message" - commits locally
+git push origin master - commit online (master is branch)
+git log
+git diff
+
+git status - !important
+
+WEBSTORM!!!!!!!!!!!!!!!!!!!!!!!!!
