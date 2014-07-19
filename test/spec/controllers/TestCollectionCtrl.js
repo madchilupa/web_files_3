@@ -76,7 +76,7 @@
 				
 				it ('Test increment function', function() {
 					scope.increment(currentRow, incrementColumn, 1);
-					expect(currentRow.columns[4].valueDisplayed).toEqual(10);
+					expect(currentRow.columns[4].valueDisplayed).toEqual('10');
 				});
 			});
 		});
