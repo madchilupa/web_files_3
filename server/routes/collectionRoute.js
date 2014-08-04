@@ -13,33 +13,41 @@ module.exports = function(app) {
 
     app.post('/service/officesupplies/:id', officesupplies.update);*/
 	
+	
 	function gatherGridData(request, response) {
-		dbGrid.buildPresentationData(request.query.grid, constructGridData);
-		/*var conn = sqlanywhere.createConnection();
+		dbGrid.resetGrid();
+		dbGrid.setGridName(request.query.grid);
 		
-		conn.connect(config.conn_params, function() {
-		  conn.exec('SELECT * FROM ' + request.query.grid, function (error, result) {
-			if (error) throw error;
-
-			response.send(200, constructGridData(result));
-		  })
+		dbGrid.findTableAndColumnInformation(function() {
+			dbGrid.buildPresentationData(constructGridData);
+		});
+		
+		/*dbGrid.findBaseTableName(function() {
+			dbGrid.buildPresentationData(constructGridData);
 		});*/
 		
 		function constructGridData(databasePresentationData) {
+			dbGrid.queryForData(1, dataDone);
+		}
+		
+		function dataDone() {
+			response.send(200, dbGrid.returnFinalData());
+		}
+		
 			/*var presentationData = {};
 			presentationData.columnInfo = {};
 			presentationData.columnOrder = [];*/
 			
-			var finalData = {};
-			finalData.gridName = request.query.grid;
-			finalData.rows = [];
+			// var finalData = {};
+			// finalData.gridName = request.query.grid;
+			// finalData.rows = [];
 			
-			for (var i = 0; i < databasePresentationData.length; i++) {
-				finalData.rows.push({
-					columns: buildColumns(databasePresentationData[i]),
-					rowID: i+1
-				});
-			}
+			// for (var i = 0; i < databasePresentationData.length; i++) {
+				// finalData.rows.push({
+					// columns: buildColumns(databasePresentationData[i]),
+					// rowID: i+1
+				// });
+			// }
 			
 			/*for (var i = 0; i < databasePresentationData.count; i++) {
 				var currentColumn = databasePresentationData[i];
@@ -48,15 +56,15 @@ module.exports = function(app) {
 				presentationData.columnInfo[uniqueKey] = currentColumn;
 				presentationData.push(uniqueKey);
 			}*/
-			response.send(200, finalData);
-			var result = {};
-			var presentationData = {};
+			// response.send(200, finalData);
+			// var result = {};
+			// var presentationData = {};
 			
 			//presentationData = dbGrid.
-		}
+		// }
 		
-		function buildColumns(currDBColumn) {
-			return [{
+		function buildColumns(databaseRowData) {
+			/*return [{
 				tableName: request.query.grid,
 				columnName: 'ColumnName',
 				columnType: 'varchar',
@@ -80,7 +88,7 @@ module.exports = function(app) {
 				columnType: 'varchar',
 				readOnly: true,
 				valueDisplayed: currDBColumn.ColumnNameDisplayed
-			}];
+			}];*/
 		}
 	}	
 };

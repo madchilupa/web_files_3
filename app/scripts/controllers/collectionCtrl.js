@@ -29,4 +29,8 @@ angular.module('WebFiles3App')
 			incrementColumn.change = '';
 		}
 	};
+	
+	$scope.testRowBlur = function() {
+		console.log('hi');
+	};
   });

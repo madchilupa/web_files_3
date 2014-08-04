@@ -1,10 +1,19 @@
+Rows to display:
+<select ng-model="grid.numToDisplay">
+	<option value="10">10</option>
+	<option value="50">50</option>
+	<option value="100">100</option>
+	<option value="500">500</option>
+</select>
 <table style="width:98%;">
 	<tr>
+		<th>#</th>
 		<th ng-repeat="col in grid.rows[0].columns">
 			{{col.columnName}}
 		</th>
 	</tr>
-	<tr ng-repeat="row in grid.rows">
+	<tr ng-repeat="row in grid.rows | limitTo:grid.numToDisplay | orderBy:valueDisplayed" ng-blur="testRowBlur();">
+		<td>{{row.rowID}}</td>
 		<td ng-repeat="col in row.columns">
 			<input type="text" name="{{col.tableName}}.{{col.columnName}}" id="{{row.rowID}}-{{col.tableName}}-{{col.columnName}}" ng-if="col.columnType == 'varchar' && col.readOnly == false" 
 				ng-model="col.valueDisplayed" />
