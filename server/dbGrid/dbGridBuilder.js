@@ -2,6 +2,14 @@
 
 var dbase = require('../sqlAnywhere/DatabaseInterface');
 
+function safeUpperCase(value) {
+	if (value != null) {
+		return value.toUpperCase();
+	} else {
+		return '';
+	}
+};
+
 var gridObject = function() {
 	this.gridName = null;
 	this.baseTableName = null;
@@ -29,7 +37,7 @@ var tableInformation = function() {
 tableInformation.prototype = {};
 
 tableInformation.prototype.addProperty = function(memberName, value) {
-	switch (memberName.toUpperCase()) {
+	switch (safeUpperCase(memberName)) {
 		case 'UNIQUECOLUMNNAME':
 			this.uniqueColumnName = value;
 			break;
@@ -56,11 +64,17 @@ var gridColumnDefinition = function() {
 	
 	this.tableAlias = null;
 	this.columnAlias = null;
+	
+	this.htmlType = 'text';
+	this.htmlDisabled = true;
+	this.htmlPattern = '';
+	this.htmlClass = '';
+	this.htmlBlur = '';
 };
 gridColumnDefinition.prototype = {};
 
 gridColumnDefinition.prototype.addProperty = function(memberName, value) {
-	switch (memberName.toUpperCase()) {
+	switch (safeUpperCase(memberName)) {
 		case 'CELLCONTROLTYPE':
 			this.cellControlType = value;
 			break;
@@ -99,7 +113,7 @@ gridColumnDefinition.prototype.addProperty = function(memberName, value) {
 
 gridColumnDefinition.prototype.calculateCellControlType = function() {
 	if (this.cellControlType == null) {
-		if (this.columnType != null && this.columnType.toUpperCase == 'BIT') {
+		if (this.columnType != null && safeUpperCase(this.columnType) == 'BIT') {
 			this.cellControlType = 'CHECKBOX';
 		} else {
 			this.cellControlType = 'LABEL';
@@ -116,6 +130,35 @@ var cellData = function() {
 	this.databaseValue = null;
 };
 cellData.prototype = {};
+
+cellData.prototype.calculateHtmlProperties = function() {
+	switch (safeUpperCase(this.columnType)) {
+		case 'BIT':
+			this.htmlType = 'checkbox';
+			break;
+		case 'DATE':
+			this.htmlType = 'text';
+			break;
+		case 'DECREMENT':
+			this.htmlType = 'text';
+			this.htmlPattern = '/^\d+$/';
+			this.ngBlur = 'increment(row, col, -1)';
+		case 'INCREMENT':
+			this.htmlType = 'text';
+			this.htmlPattern = '/^\d+$/';
+			this.ngBlur = 'increment(row, col, 1)';
+		case 'INTEGER':
+			this.htmlType= 'text';
+			this.htmlPattern = '/^\d+$/';
+			break;
+		case 'VARCHAR':
+			this.htmlType = 'text';
+			break;
+	}
+	if (this.readOnly == false) {
+		this.htmlDisabled = false;
+	}
+};
 
 var currentGrid = new gridObject();
 
@@ -317,6 +360,7 @@ module.exports.queryForData = function(pageNumber, callback) {
 				newCell.valueDisplayed = databaseData[i][column.columnAlias];
 				newCell.columnType = column.columnType;
 				newCell.readOnly = column.readOnly;
+				newCell.calculateHtmlProperties();
 				newRow.columns.push(newCell);
 			}
 			currentGrid.rowData.push(newRow);
@@ -330,6 +374,8 @@ module.exports.returnFinalData = function() {
 	returnData.gridName = currentGrid.gridName;
 	returnData.rows = currentGrid.rowData;
 	returnData.numToDisplay = 50;
+	returnData.rows[0].columns[0].readOnly = true;
+	console.log(returnData.rows[0]);
 	return returnData;
 };
 
