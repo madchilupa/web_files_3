@@ -14,4 +14,4 @@ git branch newBranchName (create a branch)
 git checkout newBranchName (switch to a branch)
 
 git merge branchToMerge (merges branchToMerge with current branch)
-git branch -d branchNameToDelete
+git branch -d branchNameToDelete (delete a branch)
