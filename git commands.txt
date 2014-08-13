@@ -8,3 +8,10 @@ git diff
 git status - !important
 
 WEBSTORM!!!!!!!!!!!!!!!!!!!!!!!!!
+
+git checkout -b newBranchName (is a combination of the following two lines)
+git branch newBranchName (create a branch)
+git checkout newBranchName (switch to a branch)
+
+git merge branchToMerge (merges branchToMerge with current branch)
+git branch -d branchNameToDelete
