@@ -329,7 +329,6 @@ module.exports.returnFinalData = function() {
 	var returnData = {};
 	returnData.gridName = currentGrid.gridName;
 	returnData.rows = currentGrid.rowData;
-	returnData.numToDisplay = 50;
 	return returnData;
 };
 
