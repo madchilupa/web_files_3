@@ -7,6 +7,7 @@
  * # NavigationCtrl
  * Controller of the WebFiles3App
  */
+ /*
 angular.module('WebFiles3App')
   .controller('DatadrivenCtrl', function ($scope, $http) {
 	$http.get('/collectionData', {
@@ -113,4 +114,4 @@ angular.module('WebFiles3App')
 			rowID: 2
 		}]
 	};
-  });
+  });*/
