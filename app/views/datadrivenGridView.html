@@ -1,10 +1,13 @@
 <input type="hidden" ng-model="grid.possibleChanges" />
-<div class="btn-toolbar" role="toolbar">
+<div ng-hide="grid.errors">
+	<span ng-repeat="err in grid.errorMessages">{{err.text}}</span>
+</div>
+<div class="btn-toolbar" role="toolbar" ng-hide="grid.errors">
 	<div class="btn-group btn-group-lg">
 		<button type="button" class="btn btn-default" ng-click="prepareToSaveGridChanges();"><span class="glyphicon glyphicon-floppy-disk"></span></button>
 	</div>
 </div>
-<table style="width:98%;">
+<table style="width:98%;" ng-hide="grid.errors">
 	<tr>
 		<th>#</th>
 		<th ng-repeat="col in grid.rows[0].columns">
