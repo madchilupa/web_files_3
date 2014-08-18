@@ -5,9 +5,7 @@ var dbGrid = require('../dbGrid/dbGridBuilder');
 module.exports = function(app) {
     app.get('/collectionData', gatherGridData);
 	
-	app.post('/collectionData', function(req, res) {
-		//testDatabaseStuff(req, res);
-	});
+	app.post('/collectionData', saveGridData);
 
     /*app.post('/service/officesupplies', officesupplies.add);
 
@@ -31,5 +29,13 @@ module.exports = function(app) {
 		function dataDone() {
 			response.send(200, dbGrid.returnFinalData());
 		}
-	}	
+	};
+	
+	function saveGridData(request, response) {
+		console.log(request.body);
+		//for each row, find which columns changed.
+		//build update statement
+		//	determine PK value for row, and primary table
+		//	determine which columns that didn't change need to be part of the update statement
+	};
 };

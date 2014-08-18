@@ -1,3 +1,9 @@
+<input type="hidden" ng-model="grid.possibleChanges" />
+<div class="btn-toolbar" role="toolbar">
+	<div class="btn-group btn-group-lg">
+		<button type="button" class="btn btn-default" ng-click="prepareToSaveGridChanges();"><span class="glyphicon glyphicon-floppy-disk"></span></button>
+	</div>
+</div>
 <table style="width:98%;">
 	<tr>
 		<th>#</th>
@@ -9,11 +15,11 @@
 		<td>{{row.rowID}}</td>
 		<td ng-repeat="col in row.columns">
 			<input type="text" name="{{col.tableName}}.{{col.columnName}}" id="{{row.rowID}}-{{col.tableName}}-{{col.columnName}}" ng-if="col.columnType == 'varchar' && col.readOnly == false" 
-				ng-model="col.valueDisplayed" />
+				ng-model="col.valueDisplayed" orig-value="{{col.valueDisplayed}}" ng-blur="textBoxChange($event, row, col);"/>
 			<input type="text" name="{{col.tableName}}.{{col.columnName}}" id="{{row.rowID}}-{{col.tableName}}-{{col.columnName}}" ng-if="col.columnType == 'varchar' && col.readOnly == true"
 				ng-disabled="true" ng-model="col.valueDisplayed" />
 			<input type="text" name="{{col.tableName}}.{{col.columnName}}" id="{{row.rowID}}-{{col.tableName}}-{{col.columnName}}" ng-if="col.columnType == 'date' && col.readOnly == false"
-				ng-model="col.valueDisplayed" />
+				ng-model="col.valueDisplayed" orig-value="{{col.valueDisplayed}}" ng-blur="textBoxChange($event, row, col);"/>
 			<input type="text" name="{{col.tableName}}.{{col.columnName}}" id="{{row.rowID}}-{{col.tableName}}-{{col.columnName}}" ng-if="col.columnType == 'date' && col.readOnly == true"
 				ng-disabled="true" ng-model="col.valueDisplayed" />
 			<input type="text" name="{{col.tableName}}.{{col.columnName}}" id="{{row.rowID}}-{{col.tableName}}-{{col.columnName}}" ng-if="col.columnType == 'integer' && col.readOnly == false"

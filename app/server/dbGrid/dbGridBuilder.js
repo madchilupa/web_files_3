@@ -234,7 +234,8 @@ function buildDataSQL(pageNumber) {
 };
 
 function buildPagingStatement(pageNumber) {
-	currentGrid.pagingSQL = 'SELECT TOP 500 START AT ' + ((pageNumber - 1) * 10 + 1);
+	//currentGrid.pagingSQL = 'SELECT TOP 500 START AT ' + ((pageNumber - 1) * 10 + 1);
+	currentGrid.pagingSQL = 'SELECT TOP 5 START AT ' + ((pageNumber - 1) * 10 + 1);
 };
 
 function buildSelectStatement() {
@@ -307,6 +308,7 @@ module.exports.queryForData = function(pageNumber, callback) {
 			newRow = {};
 			newRow.rowID = i + 1;
 			newRow.columns = [];
+			newRow.changes = false;
 			
 			for (var j = 0; j < currentGrid.columnOrder.length; j++) {
 				newCell = new cellData();
@@ -315,8 +317,10 @@ module.exports.queryForData = function(pageNumber, callback) {
 				newCell.columnName = column.columnName;
 				newCell.tableName = column.tableName;
 				newCell.valueDisplayed = databaseData[i][column.columnAlias];
+				newCell.origValue = databaseData[i][column.columnAlias];
 				newCell.columnType = column.columnType;
 				newCell.readOnly = column.readOnly;
+				newCell.changed = false;
 				newRow.columns.push(newCell);
 			}
 			currentGrid.rowData.push(newRow);
@@ -329,6 +333,7 @@ module.exports.returnFinalData = function() {
 	var returnData = {};
 	returnData.gridName = currentGrid.gridName;
 	returnData.rows = currentGrid.rowData;
+	returnData.possibleChanges = false;
 	return returnData;
 };
 
