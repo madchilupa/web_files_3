@@ -33,9 +33,6 @@ module.exports = function(app) {
 	
 	function saveGridData(request, response) {
 		console.log(request.body);
-		//for each row, find which columns changed.
-		//build update statement
-		//	determine PK value for row, and primary table
-		//	determine which columns that didn't change need to be part of the update statement
+		dbGrid.saveGridData(request.body);
 	};
 };

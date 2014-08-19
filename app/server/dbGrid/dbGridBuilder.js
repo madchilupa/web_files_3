@@ -219,7 +219,9 @@ function assignTableAliasesToColumnInformation()
 {
 	for (var columnDefinition in currentGrid.columnInfo) {
 		if (currentGrid.columnInfo.hasOwnProperty(columnDefinition)) {
-			currentGrid.columnInfo[columnDefinition].tableAlias = currentGrid.tableInformation[currentGrid.columnInfo[columnDefinition].tableName].tableAlias;
+			var column = currentGrid.columnInfo[columnDefinition];
+			column.tableAlias = currentGrid.tableInformation[column.tableName].tableAlias;
+			column.columnAlias = column.tableAlias + column.columnAlias;
 		}
 	}
 };
@@ -344,4 +346,30 @@ module.exports.buildPresentationData = function(callback) {
 		'ORDER BY ColumnOrder ASC';
 	
 	dbase.dbResults(cmd, callback);
+};
+
+module.exports.saveGridData = function(postData) {
+	//for each row, find which columns changed.
+		//build update statement
+		//	determine PK value for row, and primary table
+		//	determine which columns that didn't change need to be part of the update statement
+		
+	//Final SQL should look like:
+	//	UPDATE dba.TableName SET ColumnName1 = Value1, ColumnName2 = Value2 WHERE PKColumn = PKValue;
+	for (var row in postData) {
+		if (postData.hasOwnProperty(row)) {
+			var sql = '';
+			sql += ' SET';
+			for (var col in row.columns) {
+				if (row.columns.hasOwnProperty(col)) {
+					if (col.changed == true) {
+						sql += ' ' + dbase.safeDBString(col.columnName) + ' = ' + dbase.safeDBString(col.valueDisplayed + ',';
+					}
+				}
+			}
+			sql = removeLastComma(sql);
+			
+			sql += ' WHERE ';
+		}
+	}
 };
