@@ -3,21 +3,22 @@
 var dbase = require('../sqlAnywhere/DatabaseInterface');
 
 var cubeServer = function() {
-	var cubeList = [];
+	this.cubeList = [];
 };
 cubeServer.prototype = {};
 	
 cubeServer.prototype.gatherListOfRotationEligibleCubes = function(callback) {
-console.log('here');
 	var newCube = new cube();
 	
 	newCube.name = 'Big Boy Cube';
 	newCube.id = 2;
-	cubeList.push(newCube);
+	this.cubeList.push(newCube);
+	
+	callback();
 };
 	
-cubeServer.prototype.validCubeList = function() {
-	if (cubeList.length > 0) {
+cubeServer.prototype.isValidCubeList = function() {
+	if (this.cubeList.length > 0) {
 		return true;
 	} else {
 		return false;
@@ -25,7 +26,7 @@ cubeServer.prototype.validCubeList = function() {
 };
 	
 cubeServer.prototype.returnCubeList = function() {
-	return cubeList;
+	return this.cubeList;
 };
 
 var cube = function() {
@@ -34,8 +35,24 @@ var cube = function() {
 };
 cube.prototype = {};
 
-var serverObject = new cubeServer();
+function gatherListOfRotationEligibleCubes(callback) {
+	serverObject.gatherListOfRotationEligibleCubes(callback);
+};
 
-module.exports.gatherListofRotationEligibleCubes = serverObject.gatherListOfRotationEligibleCubes;
-module.exports.returnCubeList = serverObject.returnCubeList;
-module.exports.validCubeList = serverObject.validCubeList;
+function reset() {
+	serverObject = new cubeServer();
+};
+
+function returnCubeList() {
+	return serverObject.returnCubeList();
+};
+
+function isValidCubeList() {
+	return serverObject.isValidCubeList();
+};
+
+var serverObject = new cubeServer();
+module.exports.gatherListOfRotationEligibleCubes = gatherListOfRotationEligibleCubes;
+module.exports.reset = reset;
+module.exports.returnCubeList = returnCubeList;
+module.exports.isValidCubeList = isValidCubeList;

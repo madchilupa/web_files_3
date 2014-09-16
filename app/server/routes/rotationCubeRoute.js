@@ -6,6 +6,7 @@ module.exports = function(app) {
 	app.get('/cubeList', gatherCubeList);
 	
 	function gatherCubeList(request, response) {
+		cubeServer.reset();
 		cubeServer.gatherListOfRotationEligibleCubes(listGathered);
 		
 		function listGathered() {
