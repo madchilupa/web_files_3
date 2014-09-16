@@ -363,7 +363,7 @@ module.exports.saveGridData = function(postData) {
 			for (var col in row.columns) {
 				if (row.columns.hasOwnProperty(col)) {
 					if (col.changed == true) {
-						sql += ' ' + dbase.safeDBString(col.columnName) + ' = ' + dbase.safeDBString(col.valueDisplayed + ',';
+						sql += ' ' + dbase.safeDBString(col.columnName) + ' = ' + dbase.safeDBString(col.valueDisplayed) + ',';
 					}
 				}
 			}
