@@ -17,4 +17,11 @@ angular.module('WebFiles3App')
 		.error(function(data, status, headers, config) {
 			$scope.error = 'Error: ' + data;
 		});
+	
+	$scope.list1 = [];
+	$scope.cards = [
+		{name: 'Student of Warfare', color: 'White'},
+		{name: 'Champion of the Parish', color: 'White'},
+		{name: 'Elite Vanguard', color: 'White'}
+	];
   });
