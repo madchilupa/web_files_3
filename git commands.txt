@@ -15,3 +15,19 @@ git checkout newBranchName (switch to a branch)
 
 git merge branchToMerge (merges branchToMerge with current branch)
 git branch -d branchNameToDelete (delete a branch)
+
+
+
+
+
+
+
+
+
+Start the server
+cd /d d:\my documents\dropbox\web_files_3
+node app/server/server.js
+
+
+git bash
+cd d:/"my documents"/dropbox/web_files_3
