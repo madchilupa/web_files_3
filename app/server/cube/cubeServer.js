@@ -83,7 +83,6 @@ cubeServer.prototype.cardsInEachSlot = function(callback) {
 				tempSlots[slotID] = new slot();
 				tempSlots[slotID].slotID = slotID;
 				tempSlots[slotID].generatedSlotName = databaseData[i]['GeneratedName'];
-				tempSlots[slotID].cards = [];
 				slotOrder.push(slotID);
 			}
 			var tempCard = new card();
@@ -115,22 +114,22 @@ cubeServer.prototype.returnCubeBySlots = function() {
 };
 
 var cube = function() {
-	var name = '';
-	var id = -1;
+	this.name = '';
+	this.id = -1;
 };
 cube.prototype = {};
 
 var slot = function() {
-	var cards = [];
-	var slotID = -1;
-	var generatedSlotName = '';
+	this.cards = [];
+	this.slotID = -1;
+	this.generatedSlotName = '';
 };
 slot.prototype = {};
 
 var card = function() {
-	var name = '';
-	var cardID = -1;
-	var color = '';
+	this.name = '';
+	this.cardID = -1;
+	this.color = '';
 };
 card.prototype = {};
 

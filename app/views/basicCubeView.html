@@ -1,4 +1,4 @@
-<div>header
+<div>
 <select name="chosenCube">
 	<option ng-repeat="cube in cubeList.cube">{{cube.name}}</option>
 </select>
@@ -8,13 +8,15 @@
 </div>
 
 <div>
-	<table style="border: 1px solid; width:100%;">
+	<table class="rotationCubeTable">
 		<tr ng-repeat="slot in displayData.slots" ng-if="slot.cards[0].color == displayData.meta.colorSelected">
 			<th>{{slot.slotID}}</th>
 			<td>{{slot.generatedSlotName}}</td>
 			<td>{{slot.name}}</td>
-			<td ng-repeat="card in slot.cards">
+			<td ng-repeat="card in slot.cards" ng-if="card.cardID != '-1'" class="dataCell">
 				{{card.name}}
+			</td>
+			<td ng-repeat="card in slot.cards" ng-if="card.cardID == '-1'" class="emptyCell">
 			</td>
 		</tr>
 	</table>
