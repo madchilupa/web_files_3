@@ -18,6 +18,10 @@ app.config(['$routeProvider',
             templateUrl: '/views/datadrivenGridView.html',
             controller: 'DatadrivenCtrl'
         }).
+		when('/cube', {
+			templateUrl: '/views/rotationCubeView.html',
+			controller: 'RotationCubeCtrl'
+		}).
         /*when('/:id/edit', {
             templateUrl: '/views/editofficesupply.html',
             controller: 'EditOfficeSupply'

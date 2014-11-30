@@ -25,9 +25,15 @@ git branch -d branchNameToDelete (delete a branch)
 
 
 Start the server
+<<<<<<< HEAD
 cd /d d:\my documents\dropbox\web_files_3
 node app/server/server.js
 
 
 git bash
 cd d:/"my documents"/dropbox/web_files_3
+=======
+
+cd /d d:\my documents\dropbox\web_files_3
+node app/server/server.js
+>>>>>>> ROtationCube

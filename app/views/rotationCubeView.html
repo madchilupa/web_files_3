@@ -1,0 +1,35 @@
+<div>{{error}}</div>
+<div>header
+<select name="chosenCube">
+	<option ng-repeat="cube in cubeList.cube">{{cube.name}}</option>
+</select>
+</div>
+
+<div class="contentWrapper ng-cloak">
+	<div class="content">
+	  <div class="row-fluid">
+		<ul class="thumbnails">
+		  <li class="span3" style="margin-left:10px;">
+			  
+<div class="thumbnail" data-drop="true" ng-model="list1" data-jqyoui-options="{accept: '.btn-draggable:not([ng-model=list1])'}" jqyoui-droppable="{multiple:true}">
+	<div class="caption">
+		<div class="btn btn-info btn-draggable" ng-repeat="item in list1" ng-show="item.name" data-drag="true" data-jqyoui-options="{revert: 'invalid'}" ng-model="list1" jqyoui-draggable="{index: {{$index}}, animate:true}">{{item.name}}</div>
+	</div>
+</div>
+	
+		  </li>
+		</ul>
+	  </div>
+	</div>
+</div>
+
+<div class="navbar-inner">
+	<div class="container form-inline" style="text-align: center;">
+	
+	
+<div class="btn btn-droppable" ng-repeat="item in cards" data-drop="true" ng-model="cards" data-jqyoui-options="{accept:'.btn-draggable:not([ng-model=cards])'}" jqyoui-droppable="{index: {{$index}}}">
+	<div class="btn btn-info btn-draggable" data-drag="true" data-jqyoui-options="{revert: 'invalid'}" ng-model="cards" jqyoui-draggable="{index: {{$index}}, placeholder:true, animate:true}" ng-hide="!item.name">{{item.name}}</div>
+</div>
+
+	</div>
+</div>
