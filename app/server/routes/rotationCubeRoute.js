@@ -4,6 +4,7 @@ var cubeServer = require('../cube/cubeServer');
 
 module.exports = function(app) {
 	app.get('/cubeList', gatherCubeList);
+	app.get('/cubeView', viewCubeContents);
 	
 	function gatherCubeList(request, response) {
 		cubeServer.reset();
@@ -15,6 +16,15 @@ module.exports = function(app) {
 			} else {
 				response.send(500, 'No elligible cubes found');
 			}
+		}
+	};
+	
+	function viewCubeContents(request, response) {	
+		cubeServer.reset();
+		cubeServer.gatherAllCardsBySlotID(listGathered);
+		
+		function listGathered() {
+			response.send(200, cubeServer.returnCubeBySlots());
 		}
 	};
 };
