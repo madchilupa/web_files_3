@@ -1,0 +1,21 @@
+<div>header
+<select name="chosenCube">
+	<option ng-repeat="cube in cubeList.cube">{{cube.name}}</option>
+</select>
+<select ng-model="displayData.meta.colorSelected">
+	<option ng-repeat="color in displayData.meta.colors">{{color.name}}</option>
+</select>
+</div>
+
+<div>
+	<table style="border: 1px solid; width:100%;">
+		<tr ng-repeat="slot in displayData.slots" ng-if="slot.cards[0].color == displayData.meta.colorSelected">
+			<th>{{slot.slotID}}</th>
+			<td>{{slot.generatedSlotName}}</td>
+			<td>{{slot.name}}</td>
+			<td ng-repeat="card in slot.cards">
+				{{card.name}}
+			</td>
+		</tr>
+	</table>
+</div>

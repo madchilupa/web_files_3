@@ -22,6 +22,10 @@ app.config(['$routeProvider',
 			templateUrl: '/views/rotationCubeView.html',
 			controller: 'RotationCubeCtrl'
 		}).
+		when('/cubeBasic', {
+			templateUrl: '/views/basicCubeView.html',
+			controller: 'BasicCubeCtrl'
+		}).
         /*when('/:id/edit', {
             templateUrl: '/views/editofficesupply.html',
             controller: 'EditOfficeSupply'
