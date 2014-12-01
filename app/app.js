@@ -1,6 +1,6 @@
-var App = angular.module('drag-and-drop', ['ngDragDrop']);
+var app = angular.module('drag-and-drop', ['ngDragDrop']);
 
-App.controller('oneCtrl', function($scope, $timeout) {
+app.controller('oneCtrl', function($scope, $timeout) {
   $scope.list1 = [];
   $scope.list2 = [];
   $scope.list3 = [];
@@ -27,4 +27,6 @@ App.controller('oneCtrl', function($scope, $timeout) {
 	  }
     }
   };
+  $scope.stopDrag = function() {debugger;
+	}
 });

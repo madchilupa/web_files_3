@@ -94,6 +94,7 @@ cubeServer.prototype.cardsInEachSlot = function(callback) {
 		//finished loading data, format it for client-side
 		var finalJson = {};
 		finalJson.slots = [];
+		finalJson.slots.push(new slot());
 		for (var i = 0; i < slotOrder.length; i++) {
 			for (var j = tempSlots[slotOrder[i]].cards.length; j < that.maxCardsInSlot; j++) {
 				tempSlots[slotOrder[i]].cards.push(new card());
