@@ -5,6 +5,7 @@ var cubeServer = require('../cube/cubeServer');
 module.exports = function(app) {
 	app.get('/cubeList', gatherCubeList);
 	app.get('/cubeView', viewCubeContents);
+	app.get('/cubeSave', saveSlotChanges);
 	
 	function gatherCubeList(request, response) {
 		cubeServer.reset();
@@ -25,6 +26,15 @@ module.exports = function(app) {
 		
 		function listGathered() {
 			response.send(200, cubeServer.returnCubeBySlots());
+		}
+	};
+	
+	function saveSlotChanges(request, response) {
+		cubeServer.reset();
+		cubeServer.compareClientToDB(request, comparisonFinished);
+		
+		function comparisonFinished() {
+			
 		}
 	};
 };

@@ -160,6 +160,10 @@ function returnCubeBySlots() {
 	return serverObject.returnCubeBySlots();
 };
 
+function compareClientToDB(clientData, callback) {
+	return serverObject.compareClientToDB(clientData, callback);
+};
+
 var serverObject = new cubeServer();
 module.exports.gatherListOfRotationEligibleCubes = gatherListOfRotationEligibleCubes;
 module.exports.reset = reset;
@@ -167,3 +171,4 @@ module.exports.returnCubeList = returnCubeList;
 module.exports.isValidCubeList = isValidCubeList;
 module.exports.gatherAllCardsBySlotID = gatherAllCardsBySlotID
 module.exports.returnCubeBySlots = returnCubeBySlots;
+module.exports.compareClientToDB = compareClientToDB;

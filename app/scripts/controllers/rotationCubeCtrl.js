@@ -37,7 +37,14 @@ angular.module('WebFiles3App')
 	
 	$scope.stopDrag = function(a, b, c) {debugger;
 	}
-	$scope.buttonClicked = function(color) {
+	$scope.colorButtonClicked = function(color) {
 		$scope.displayData.meta.colorSelected = color;
+	}
+	$scope.saveChanges = function() {
+		$http.post('/cubeSave', $scope.displayData.slots, {})
+			.success(function(data, status, headers, config) {
+			})
+			.error(function(data, status, headers, config) {
+			});
 	}
   });
