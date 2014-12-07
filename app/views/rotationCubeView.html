@@ -9,13 +9,13 @@
 </div>
 
 <div class="testTable">
-	<div style="border: 1px solid;" ng-repeat="slot in displayData.slots" ng-if="slot.cards[0].color == displayData.meta.colorSelected">
-		<span class="btn btn-droppable" ng-model="slot.cards" data-drop="true" data-jqyoui-options="{accept: '.btn-draggable'}" jqyoui-droppable="{}">
+	<div style="border: 1px solid; clear:both;" ng-repeat="slot in displayData.slots" ng-if="slot.cards[0].color == displayData.meta.colorSelected">
+		<span style="float:left;" class="btn btn-droppable" ng-model="slot.cards" data-drop="true" data-jqyoui-options="{accept: '.btn-draggable'}" jqyoui-droppable="{}">
 			Drop Here
 		</span>
-		<span ng-repeat="card in slot.cards">
-			<span ng-if="card.draggable == true" class="btn btn-info btn-draggable"  data-drag="true" data-jqyoui-options="{revert: 'invalid'}" ng-model="slot.cards" jqyoui-draggable="{index: {{$index}}, placeholder: false, animate:true, onStop: 'stopDrag()'}">{{card.name}}</span>
-			<span ng-if="card.draggable == false" class="btn btn-info" ng-disabled="card.draggable == false" ng-model="slot.cards">{{card.name}}</span>
+		<span style="float:left;" ng-repeat="card in slot.cards">
+			<span style="float:left;" ng-if="card.draggable == true" class="btn btn-info btn-draggable"  data-drag="true" data-jqyoui-options="{revert: 'invalid'}" ng-model="slot.cards" jqyoui-draggable="{index: {{$index}}, placeholder: false, animate:true, onStop: 'stopDrag()'}">{{card.name}}</span>
+			<span style="float:left;" ng-if="card.draggable == false" class="btn btn-info" ng-disabled="card.draggable == false" ng-model="slot.cards">{{card.name}}</span>
 		</span>
 	</div>
 </div>
