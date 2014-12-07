@@ -22,19 +22,22 @@ angular.module('WebFiles3App')
 			$scope.displayData = data;
 			
 			$scope.displayData.meta.colors = [];
-			$scope.displayData.meta.colors[1] = {name: 'White', ID: 1};
-			$scope.displayData.meta.colors[2] = {name: 'Blue', ID: 2};
-			$scope.displayData.meta.colors[3] = {name: 'Black', ID: 3};
-			$scope.displayData.meta.colors[4] = {name: 'Red', ID: 4};
-			$scope.displayData.meta.colors[5] = {name: 'Green', ID: 5};
-			$scope.displayData.meta.colors[6] = {name: 'Colorless', ID: 6};
-			$scope.displayData.meta.colors[7] = {name: 'Multicolor', ID: 7};
-			$scope.displayData.meta.colors[8] = {name: 'Land', ID: 8};
+			$scope.displayData.meta.colors.push({name: 'White', ID: 1});
+			$scope.displayData.meta.colors.push({name: 'Blue', ID: 2});
+			$scope.displayData.meta.colors.push({name: 'Black', ID: 3});
+			$scope.displayData.meta.colors.push({name: 'Red', ID: 4});
+			$scope.displayData.meta.colors.push({name: 'Green', ID: 5});
+			$scope.displayData.meta.colors.push({name: 'Colorless', ID: 6});
+			$scope.displayData.meta.colors.push({name: 'Multicolor', ID: 7});
+			$scope.displayData.meta.colors.push({name: 'Land', ID: 8});
 		})
 		.error(function(data, status, headers, config) {
 			$scope.error = 'Error: ' + data;
 		});
 	
-	$scope.stopDrag = function(a, b, c) {
+	$scope.stopDrag = function(a, b, c) {debugger;
+	}
+	$scope.buttonClicked = function(color) {
+		$scope.displayData.meta.colorSelected = color;
 	}
   });

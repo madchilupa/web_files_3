@@ -1,15 +1,20 @@
 <div>{{error}}</div>
-<div>header
-<select name="chosenCube">
-	<option ng-repeat="cube in cubeList.cube">{{cube.name}}</option>
-</select>
-<select ng-model="displayData.meta.colorSelected">
-	<option ng-repeat="color in displayData.meta.colors">{{color.name}}</option>
-</select>
+<div class="btn-toolbar" role="toolbar">
+	<div class="btn-group btn-group">
+		<button type="button" class="btn btn-default" ng-click="prepareToSaveGridChanges();"><span class="glyphicon glyphicon-floppy-disk"></span></button>
+	</div>
+	<select name="chosenCube">
+		<option ng-repeat="cube in cubeList.cube">{{cube.name}}</option>
+	</select>
+	<div class="btn-group" data-toggle="buttons">
+		<label class="btn btn-default" ng-repeat="color in displayData.meta.colors"  ng-click="buttonClicked(color.name)">
+			{{color.name}}
+		</label>
+	</div>
 </div>
 
 <div class="testTable">
-	<div style="border: 1px solid; clear:both;" ng-repeat="slot in displayData.slots" ng-if="slot.cards[0].color == displayData.meta.colorSelected">
+	<div style=" clear:both;" ng-repeat="slot in displayData.slots" ng-if="slot.cards[0].color == displayData.meta.colorSelected">
 		<span style="float:left;" class="btn btn-droppable" ng-model="slot.cards" data-drop="true" data-jqyoui-options="{accept: '.btn-draggable'}" jqyoui-droppable="{}">
 			Drop Here
 		</span>
