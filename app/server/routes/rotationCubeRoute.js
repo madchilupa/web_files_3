@@ -22,7 +22,7 @@ module.exports = function(app) {
 	
 	function viewCubeContents(request, response) {	
 		cubeServer.reset();
-		cubeServer.gatherAllCardsBySlotID(listGathered);
+		cubeServer.cardsInEachSlot(listGathered);
 		
 		function listGathered() {
 			response.send(200, cubeServer.returnCubeBySlots());

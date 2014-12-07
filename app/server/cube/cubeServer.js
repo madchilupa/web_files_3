@@ -5,7 +5,6 @@ var dbase = require('../sqlAnywhere/DatabaseInterface');
 var cubeServer = function() {
 	this.cubeList = [];
 	this.cubeBySlots = {};
-	this.maxCardsInSlot = 0;
 };
 cubeServer.prototype = {};
 	
@@ -30,29 +29,6 @@ cubeServer.prototype.isValidCubeList = function() {
 cubeServer.prototype.returnCubeList = function() {
 	return this.cubeList;
 };
-
-cubeServer.prototype.gatherAllCardsBySlotID = function(callback) {
-	var that = this, cmd = 
-		'SELECT max(temp.num) as maxNum ' +
-		'FROM (SELECT count(*) as num ' +
-		'FROM dba.CubeContents cc ' +
-		'JOIN dba.Card c on c.ID = cc.CardID ' +
-		'JOIN dba.CubeSlot cs on cs.ID = cc.SlotID ' +
-		'WHERE cc.CubeID = 11 and c.ID in (SELECT DISTINCT c.id ' +
-		'	FROM dba.CubeContents cc ' +
-		'	JOIN dba.Card c on c.ID = cc.CardID ' +
-		'	WHERE cc.CubeID = 11 and (SELECT isnull(sum(Quantity), 0) FROM dba.CubeContents WHERE CubeID = 11 and CardID = c.ID and AddDel = \'A\' and ' +
-		'			ChangeDate <= current date) - ' +
-		'		(SELECT isnull(sum(Quantity), 0) FROM dba.CubeContents WHERE CubeID = 11 and CardID = c.ID and AddDel = \'D\' and ' +
-		'			ChangeDate <= current date) > 0 ) ' +
-		'GROUP BY cs.generatedname) temp';
-	dbase.dbResults(cmd, function(databaseData) {
-		if (databaseData[0]) {
-			that.maxCardsInSlot = databaseData[0]['maxNum'];
-		}
-		that.cardsInEachSlot(callback);
-	});
-}
 
 cubeServer.prototype.cardsInEachSlot = function(callback) {
 	var that = this, cmd =
@@ -116,6 +92,10 @@ cubeServer.prototype.returnCubeBySlots = function() {
 	return this.cubeBySlots;
 };
 
+cubeServer.prototype.compareClientToDB = function(clientData, callback) {
+	callback();
+};
+
 var cube = function() {
 	this.name = '';
 	this.id = -1;
@@ -152,8 +132,8 @@ function isValidCubeList() {
 	return serverObject.isValidCubeList();
 };
 
-function gatherAllCardsBySlotID(callback) {
-	return serverObject.gatherAllCardsBySlotID(callback);
+function cardsInEachSlot(callback) {
+	return serverObject.cardsInEachSlot(callback);
 };
 
 function returnCubeBySlots() {
@@ -169,6 +149,6 @@ module.exports.gatherListOfRotationEligibleCubes = gatherListOfRotationEligibleC
 module.exports.reset = reset;
 module.exports.returnCubeList = returnCubeList;
 module.exports.isValidCubeList = isValidCubeList;
-module.exports.gatherAllCardsBySlotID = gatherAllCardsBySlotID
+module.exports.cardsInEachSlot = cardsInEachSlot;
 module.exports.returnCubeBySlots = returnCubeBySlots;
 module.exports.compareClientToDB = compareClientToDB;
