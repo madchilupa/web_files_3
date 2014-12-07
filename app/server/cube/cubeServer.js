@@ -84,21 +84,23 @@ cubeServer.prototype.cardsInEachSlot = function(callback) {
 				tempSlots[slotID].slotID = slotID;
 				tempSlots[slotID].generatedSlotName = databaseData[i]['GeneratedName'];
 				slotOrder.push(slotID);
+				var tempCard = new card();
+				tempCard.name = databaseData[i]['GeneratedName'];
+				tempCard.color = databaseData[i]['color'];
+				tempCard.draggable = false;
+				tempSlots[slotID].cards.push(tempCard);
 			}
 			var tempCard = new card();
 			tempCard.name = databaseData[i]['Name'];
 			tempCard.cardID = databaseData[i]['cardID'];
 			tempCard.color = databaseData[i]['color'];
+			tempCard.draggable = true;
 			tempSlots[slotID].cards.push(tempCard);
 		}
 		//finished loading data, format it for client-side
 		var finalJson = {};
 		finalJson.slots = [];
-		finalJson.slots.push(new slot());
 		for (var i = 0; i < slotOrder.length; i++) {
-			for (var j = tempSlots[slotOrder[i]].cards.length; j < that.maxCardsInSlot; j++) {
-				tempSlots[slotOrder[i]].cards.push(new card());
-			}
 			finalJson.slots.push(tempSlots[slotOrder[i]]);
 		}
 		

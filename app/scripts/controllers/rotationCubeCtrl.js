@@ -35,34 +35,6 @@ angular.module('WebFiles3App')
 			$scope.error = 'Error: ' + data;
 		});
 	
-	$scope.testData = {};
-	$scope.testData.slots = [];
-	$scope.testData.slots.push({
-		slotID: 22,
-		generatedSlotName: 'w1c01',
-		cards: []
-	});
-	$scope.testData.slots[0].cards.push({
-		name: 'Student of Warfare', 
-		color: 'White'
-	});
-	$scope.testData.slots[0].cards.push({
-		name: 'Test Card', 
-		color: 'White'
-	});
-	$scope.testData.slots.push({
-		slotID: 24,
-		generatedSlotName: 'w1c03',
-		cards: []
-	});
-	$scope.testData.slots[1].cards.push({
-		name: 'Champion of the Parish',
-		color: 'White'
-	});
-	$scope.testData.slots[1].cards.push({
-		name: 'Savannah Lions',
-		color: 'White'
-	});
-	$scope.stopDrag = function() {debugger;
+	$scope.stopDrag = function(a, b, c) {debugger;
 	}
   });
