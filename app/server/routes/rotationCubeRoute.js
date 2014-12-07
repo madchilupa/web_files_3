@@ -25,7 +25,7 @@ module.exports = function(app) {
 		cubeServer.cardsInEachSlot(listGathered);
 		
 		function listGathered() {
-			response.send(200, cubeServer.returnCubeBySlots());
+			response.send(200, cubeServer.returnCubeBySlotsOrdered());
 		}
 	};
 	

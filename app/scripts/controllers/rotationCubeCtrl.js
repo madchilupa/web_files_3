@@ -35,7 +35,7 @@ angular.module('WebFiles3App')
 			$scope.error = 'Error: ' + data;
 		});
 	
-	$scope.stopDrag = function(a, b, c) {debugger;
+	$scope.stopDrag = function(a, b, c) {
 	}
 	$scope.colorButtonClicked = function(color) {
 		$scope.displayData.meta.colorSelected = color;

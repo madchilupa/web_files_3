@@ -4,7 +4,8 @@ var dbase = require('../sqlAnywhere/DatabaseInterface');
 
 var cubeServer = function() {
 	this.cubeList = [];
-	this.cubeBySlots = {};
+	this.cubeBySlotsOrdered = {};
+	this.cubeBySlotsKey = {};
 };
 cubeServer.prototype = {};
 	
@@ -82,18 +83,36 @@ cubeServer.prototype.cardsInEachSlot = function(callback) {
 		
 		finalJson.meta = {};
 		finalJson.meta.colorSelected = 'White';
-		that.cubeBySlots = finalJson;
+		that.cubeBySlotsOrdered = finalJson;
+		that.cubeBySlotsKey = tempSlots;
 
 		callback();
 	});
 };
 
-cubeServer.prototype.returnCubeBySlots = function() {
-	return this.cubeBySlots;
+cubeServer.prototype.returnCubeBySlotsOrdered = function() {
+	return this.cubeBySlotsOrdered;
 };
 
 cubeServer.prototype.compareClientToDB = function(clientData, callback) {
-	callback();
+	var that = this;
+	this.cardsInEachSlot(function() {
+		// for (var i = 0; i < that.cubeBySlotsOrdered.slots.length; i++) {
+			// var currSlot = that.cubeBySlotsOrdered.slots[i];
+			// if (currSlot.
+			// for (var j = 0; j < currSlot.cards.length; j++) {
+			// }
+		// }
+		for (var i = 0; i < clientData.slots.length; i++) {
+			var currSlot = clientData.slots[i];
+			
+			if (currSlot.cards.length != that.cubeBySlotsKey.slots[currSlot.slotID]) {
+			}
+			for (var j = 0; j < currSlot.cards.length; j++) {
+			}
+		}
+		callback();
+	});
 };
 
 var cube = function() {
@@ -136,8 +155,8 @@ function cardsInEachSlot(callback) {
 	return serverObject.cardsInEachSlot(callback);
 };
 
-function returnCubeBySlots() {
-	return serverObject.returnCubeBySlots();
+function returnCubeBySlotsOrdered() {
+	return serverObject.returnCubeBySlotsOrdered();
 };
 
 function compareClientToDB(clientData, callback) {
@@ -150,5 +169,5 @@ module.exports.reset = reset;
 module.exports.returnCubeList = returnCubeList;
 module.exports.isValidCubeList = isValidCubeList;
 module.exports.cardsInEachSlot = cardsInEachSlot;
-module.exports.returnCubeBySlots = returnCubeBySlots;
+module.exports.returnCubeBySlotsOrdered = returnCubeBySlotsOrdered;
 module.exports.compareClientToDB = compareClientToDB;
