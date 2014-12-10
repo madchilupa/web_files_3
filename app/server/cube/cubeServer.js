@@ -6,6 +6,10 @@ var cubeServer = function() {
 	this.cubeList = [];
 	this.cubeBySlotsOrdered = {};
 	this.cubeBySlotsKey = {};
+	
+	this.cardsAdded = {};
+	this.cardsRemoved = {};
+	this.cardsMoved = {};
 };
 cubeServer.prototype = {};
 	
@@ -97,22 +101,77 @@ cubeServer.prototype.returnCubeBySlotsOrdered = function() {
 cubeServer.prototype.compareClientToDB = function(clientData, callback) {
 	var that = this;
 	this.cardsInEachSlot(function() {
-		// for (var i = 0; i < that.cubeBySlotsOrdered.slots.length; i++) {
-			// var currSlot = that.cubeBySlotsOrdered.slots[i];
-			// if (currSlot.
-			// for (var j = 0; j < currSlot.cards.length; j++) {
-			// }
-		// }
-		for (var i = 0; i < clientData.slots.length; i++) {
-			var currSlot = clientData.slots[i];
+		var changeTypes = new changeType();
+		for (var i = 0; i < clientData.length; i++) {
+			var currSlot = clientData[i];
 			
-			if (currSlot.cards.length != that.cubeBySlotsKey.slots[currSlot.slotID]) {
-			}
 			for (var j = 0; j < currSlot.cards.length; j++) {
+				var cardToTestID = currSlot.cards[j].cardID;
+				if (cardToTestID > 0) {
+					if (!that.keyValueInArray('cardID', cardToTestID, that.cubeBySlotsKey[currSlot.slotID].cards)) {
+					// client data has a card in this slot not saved in the database
+						that.cardsAdded[cardToTestID] = new change();
+						that.cardsAdded[cardToTestID].initialize(cardToTestID, changeTypes.add, currSlot.slotID);
+					}
+				}
+			}
+			for (var j = 0; j < that.cubeBySlotsKey[currSlot.slotID].cards.length; j++) {
+				var cardToTestID = that.cubeBySlotsKey[currSlot.slotID].cards[j].cardID;
+				if (cardToTestID > 0) {
+					if (!that.keyValueInArray('cardID', cardToTestID, currSlot.cards)) {
+					// database data has a card in this slot not sent in client data
+						that.cardsRemoved[cardToTestID] = new change();
+						that.cardsRemoved[cardToTestID].initialize(cardToTestID, changeTypes.remove, currSlot.slotID);
+					}
+				}
 			}
 		}
+		for (var cardID in that.cardsAdded) {
+			if (that.cardsAdded.hasOwnProperty(cardID)) {
+				if (that.cardsRemoved[cardID]) {
+					that.cardsMoved[cardID] = new change();
+					that.cardsMoved[cardID].initialize(cardID, changeTypes.move, -1);
+					that.cardsMoved[cardID].slotFromID = that.cardsRemoved[cardID].slotID;
+					that.cardsMoved[cardID].slotToID = that.cardsAdded[cardID].slotID;
+					delete that.cardsAdded[cardID];
+					delete that.cardsRemoved[cardID];
+				}
+			}
+		}
+		that.generateChangeSQL(callback);
 		callback();
 	});
+};
+
+cubeServer.prototype.keyValueInArray = function(key, value, array) {
+	for (var i = 0; i < array.length; i++) {
+		if (array[i][key] == value) {
+			return true;
+		}
+	}
+	return false;
+};
+
+cubeServer.prototype.generateChangeSQL = function(callback) {
+	var date = new Date();
+	for (var cardID in this.cardsAdd) {
+		if (this.cardsAdded.hasOwnProperty(cardID)) {
+			this.cardsAdded[cardID].SQL = 'INSERT INTO dba.CubeContents (CardID, CubeID, Quantity, AddDel, ChangeDate, SlotID) VALUES (\'' +
+				dbase.safeDBString(cardID) + '\', 11, 1, \'A\', \'' + date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate() + '\', \'' +
+				dbase.safeDBString(this.cardsAdded[cardID].slotID) + '\')';
+		}
+	}
+	for (var cardID in this.cardsRemoved) {
+		if (this.cardsRemoved.hasOwnProperty(cardID)) {
+			this.cardsRemoved[cardID].SQL = 'INSERT INTO dba.CubeContents (CardID, CubeID, Quantity, AddDel, ChangeDate, SlotID) VALUES (\'' +
+				dbase.safeDBString(cardID) + '\', 11, 1, \'D\', \'' + date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate() + '\', \'' +
+				dbase.safeDBString(this.cardsRemoved[cardID].slotID) + '\')';
+		}
+	}
+	for (var cardID in this.cardsMoved) {
+		if (this.cardsMoved.hasOwnProperty(cardID)) {
+		}
+	}
 };
 
 var cube = function() {
@@ -134,6 +193,29 @@ var card = function() {
 	this.color = '';
 };
 card.prototype = {};
+
+var change = function () {
+	this.cardID = -1;
+	this.changeType = -1;
+	this.slotID = -1;
+	this.slotFromID = -1;
+	this.slotToID = -1;
+	this.SQL = '';
+};
+change.prototype = {};
+
+change.prototype.initialize = function(cardID, changeType, slotID) {
+	this.cardID = cardID;
+	this.changeType = changeType;
+	this.slotID = slotID;
+};
+
+var changeType = function() {
+	this.add = 1;
+	this.remove = 2;
+	this.move = 3;
+};
+changeType.prototype = {};
 
 function gatherListOfRotationEligibleCubes(callback) {
 	serverObject.gatherListOfRotationEligibleCubes(callback);
