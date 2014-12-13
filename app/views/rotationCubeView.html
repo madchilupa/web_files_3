@@ -13,15 +13,23 @@
 	</div>
 </div>
 
-<div class="testTable">
-	<div style=" clear:both;" ng-repeat="slot in displayData.slots" ng-if="slot.cards[0].color == displayData.meta.colorSelected">
-		<span style="float:left;" class="btn btn-droppable" ng-model="slot.cards" data-drop="true" data-jqyoui-options="{accept: '.btn-draggable'}" jqyoui-droppable="{}">
-			Drop Here
-		</span>
-		<span style="float:left; display: inline-block; min-width:50px; height:10px;">{{slot.slotName}}</span>
-		<span style="float:left;" ng-repeat="card in slot.cards">
-			<span style="float:left;" ng-if="card.draggable == true" class="btn btn-info btn-draggable"  data-drag="true" data-jqyoui-options="{revert: 'invalid'}" ng-model="slot.cards" jqyoui-draggable="{index: {{$index}}, placeholder: false, animate:true, onStop: 'stopDrag()'}">{{card.name}}</span>
-			<span style="float:left;" ng-if="card.draggable == false" class="btn btn-info" ng-disabled="card.draggable == false" ng-model="slot.cards">{{card.name}}</span>
+<div>
+	<div style="float:left; display:inline-block;">
+		<div style="clear:both;" ng-repeat="slot in displayData.slots" ng-if="slot.cards[0].color == displayData.meta.colorSelected">
+			<span style="float:left;">
+				<span style="float:left;" class="btn btn-droppable" ng-model="slot.cards" data-drop="true" data-jqyoui-options="{accept: '.btn-draggable'}" jqyoui-droppable="{}">
+					Drop Here
+				</span>
+			</span>
+			<span style="float:left; display: inline-block; min-width:50px;" class="btn">{{slot.slotName}}</span>
+		</div>
+	</div>
+	<div style="float:left; display:inline-block;">
+		<span style="clear:both; float:left; display:inline-block;" ng-repeat="slot in displayData.slots" ng-if="slot.cards[0].color == displayData.meta.colorSelected">
+			<span style="float:left;" ng-repeat="card in slot.cards">
+				<span style="float:left;" ng-if="card.draggable == true" class="btn btn-info btn-draggable"  data-drag="true" data-jqyoui-options="{revert: 'invalid'}" ng-model="slot.cards" jqyoui-draggable="{index: {{$index}}, placeholder: false, animate:true, onStop: 'stopDrag()'}">{{card.name}}</span>
+				<span style="float:left;" ng-if="card.draggable == false" class="btn btn-info" ng-disabled="card.draggable == false" ng-model="slot.cards">{{card.name}}</span>
+			</span>
 		</span>
 	</div>
 </div>
