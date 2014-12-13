@@ -6,7 +6,10 @@ var config = require('../config'),
 module.exports.safeDBString = function(unsafeString) {
 	var safeString = '';
 	
-	if (unsafeString != null && unsafeString != '') {
+	if (!isNaN(parseInt(unsafeString))) {
+		safeString = unsafeString;
+	}
+	if (unsafeString != null && unsafeString != '' && typeof unsafeString.replace === 'function') {
 		safeString = unsafeString.replace(/\'/g, "''");
 		safeString = safeString.replace(/\//g, "//");
 		safeString = safeString.replace(/®/g, "");
