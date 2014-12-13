@@ -37,9 +37,16 @@ angular.module('WebFiles3App')
 	
 	$scope.stopDrag = function(a, b, c) {
 	}
+	
 	$scope.colorButtonClicked = function(color) {
+		this.deselectOtherButtons(color);
 		$scope.displayData.meta.colorSelected = color;
 	}
+	
+	$scope.deselectOtherButtons = function(color) {
+		$('#buttonsColorSwitching label[color!=\'' + color + '\']').removeClass('active');
+	}
+	
 	$scope.saveChanges = function() {
 		$http.post('/cubeSave', $scope.displayData.slots, {})
 			.success(function(data, status, headers, config) {

@@ -6,8 +6,8 @@
 	<select name="chosenCube">
 		<option ng-repeat="cube in cubeList.cube">{{cube.name}}</option>
 	</select>
-	<div class="btn-group" data-toggle="buttons">
-		<label class="btn btn-default" ng-repeat="color in displayData.meta.colors"  ng-click="colorButtonClicked(color.name)">
+	<div class="btn-group" data-toggle="buttons" id="buttonsColorSwitching">
+		<label class="btn btn-default" ng-class="{'active': $index == 0}" color="{{color.name}}" ng-repeat="color in displayData.meta.colors" ng-click="colorButtonClicked(color.name)">
 			{{color.name}}
 		</label>
 	</div>
