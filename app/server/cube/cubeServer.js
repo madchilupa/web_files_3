@@ -11,6 +11,9 @@ var cubeServer = function() {
 	this.cardsRemoved = {};
 	this.cardsMoved = {};
 	this.slotChanges = {};
+	this.numberOfTransactions = 0;
+	this.errors = [];
+	this.numTransactionsExecuted = 0;
 };
 cubeServer.prototype = {};
 	
@@ -65,7 +68,11 @@ cubeServer.prototype.cardsInEachSlot = function(callback) {
 		'ORDER BY SlotSequence, cs.GeneratedName, c.Name ASC;' +
 		'END';
 	dbase.dbResults(cmd, function(databaseData) {
-		that.storeDatabaseSlotData(databaseData, callback);
+		if (databaseData.dbError) {
+			callback(databaseData);
+		} else {
+			that.storeDatabaseSlotData(databaseData, callback);
+		}
 	});
 };
 
@@ -113,8 +120,12 @@ cubeServer.prototype.returnCubeBySlotsOrdered = function() {
 
 cubeServer.prototype.compareClientToDB = function(clientData, callback) {
 	var that = this;
-	this.cardsInEachSlot(function() {
-		that.gatherChanges(clientData, callback);
+	this.cardsInEachSlot(function(databaseData) {
+		if (databaseData.dbError) {
+			callback(databaseData);
+		} else {
+			that.gatherChanges(clientData);
+		}
 	});
 };
 
@@ -162,8 +173,8 @@ cubeServer.prototype.gatherChanges = function(clientData, callback) {
 			}
 		}
 	}
-	this.generateChangeSQL(callback);
-	callback();
+	this.generateChangeSQL();
+	this.saveChanges(callback);
 };
 
 cubeServer.prototype.keyValueInArray = function(key, value, array) {
@@ -175,14 +186,14 @@ cubeServer.prototype.keyValueInArray = function(key, value, array) {
 	return false;
 };
 
-cubeServer.prototype.generateChangeSQL = function(callback) {
+cubeServer.prototype.generateChangeSQL = function() {
 	var date = new Date();
 	for (var cardID in this.cardsAdd) {
 		if (this.cardsAdded.hasOwnProperty(cardID)) {
 			this.cardsAdded[cardID].SQL = 'INSERT INTO dba.CubeContents (CardID, CubeID, Quantity, AddDel, ChangeDate, SlotID) VALUES (\'' +
 				dbase.safeDBString(cardID) + '\', 11, 1, \'A\', \'' + date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate() + '\', \'' +
 				dbase.safeDBString(this.cardsAdded[cardID].slotID) + '\'); ';
-			console.log(this.cardsAdded[cardID].SQL);
+			this.numberOfTransactions++;
 		}
 	}
 	for (var cardID in this.cardsRemoved) {
@@ -190,7 +201,7 @@ cubeServer.prototype.generateChangeSQL = function(callback) {
 			this.cardsRemoved[cardID].SQL = 'INSERT INTO dba.CubeContents (CardID, CubeID, Quantity, AddDel, ChangeDate, SlotID) VALUES (\'' +
 				dbase.safeDBString(cardID) + '\', 11, 1, \'D\', \'' + date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate() + '\', \'' +
 				dbase.safeDBString(this.cardsRemoved[cardID].slotID) + '\'); ';
-			console.log(this.cardsRemoved[cardID].SQL);
+			this.numberOfTransactions++;
 		}
 	}
 	for (var cardID in this.cardsMoved) {
@@ -201,7 +212,7 @@ cubeServer.prototype.generateChangeSQL = function(callback) {
 			this.cardsMoved[cardID].SQL += 'INSERT INTO dba.CubeContents (CardID, CubeID, Quantity, AddDel, ChangeDate, SlotID) VALUES (\'' +
 				dbase.safeDBString(cardID) + '\', 11, 1, \'A\', \'' + date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate() + '\', \'' +
 				dbase.safeDBString(this.cardsMoved[cardID].slotToID) + '\'); ';
-			console.log(this.cardsMoved[cardID].SQL);
+			this.numberOfTransactions++;
 		}
 	}
 	for (var slotID in this.slotChanges) {
@@ -210,9 +221,47 @@ cubeServer.prototype.generateChangeSQL = function(callback) {
 			slotChange.SQL = 'INSERT INTO dba.CubeSlotName (DisplayName, CubeSlotID, DateChanged) VALUES (\'' +
 				dbase.safeDBString(slotChange.slotName) + '\', \'' + slotID + '\', \'' + date.getFullYear() + '-' + (date.getMonth() + 1) + '-' +
 				date.getDate() + '\'); ';
-			console.log(this.slotChanges[slotID].SQL);
+			this.numberOfTransactions++;
 		}
 	}
+};
+
+cubeServer.prototype.saveChanges = function(callback) {
+callback();
+return;
+	for (var cardID in this.cardsAdded) {
+		if (this.cardsAdded.hasOwnProperty(cardID)) {
+			this.executeSQL(this.cardsAdded[cardID].SQL, callback);
+		}
+	}
+	for (var cardID in this.cardsRemoved) {
+		if (this.cardsRemoved.hasOwnProperty(cardID)) {
+			this.executeSQL(this.cardsRemoved[cardID].SQL, callback);
+		}
+	}
+	for (var cardID in this.cardsMoved) {
+		if (this.cardsMoved.hasOwnProperty(cardID)) {
+			this.executeSQL(this.cardsMoved[cardID].SQL, callback);
+		}
+	}
+	for (var slotID in this.slotChanges) {
+		if (this.slotChanges.hasOwnProperty(slotID)) {
+			this.executeSQL(this.slotChanges[slotID].SQL, callback);
+		}
+	}
+};
+
+cubeServer.prototype.executeSQL = function(sqlCommand, callback) {
+	var that = this;
+	dbase.dbResults(sqlCommand, function(databaseData) {
+		that.numTransactionsExecuted++;
+		if (databaseData.dbError) {
+			that.errors.push(databaseData.errorMessage);
+		}
+		if (that.numTransactionsExecuted == that.numberOfTransactions) {
+			callback({dbError: true, errors: that.errors});
+		}
+	});
 };
 
 var cube = function() {

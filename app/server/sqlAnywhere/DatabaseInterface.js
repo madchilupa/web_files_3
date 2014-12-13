@@ -24,7 +24,7 @@ module.exports.dbResults = function(cmdString, callback) {
 	conn.connect(config.conn_params, function() {
 		conn.exec(cmdString, function (error, result) {
 			if (error) {
-				throw error;
+				callback({dbError: true, errorMessage: error});
 			} else {
 				callback(result);
 			}

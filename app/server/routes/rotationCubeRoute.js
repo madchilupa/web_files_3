@@ -24,8 +24,12 @@ module.exports = function(app) {
 		cubeServer.reset();
 		cubeServer.cardsInEachSlot(listGathered);
 		
-		function listGathered() {
-			response.send(200, cubeServer.returnCubeBySlotsOrdered());
+		function listGathered(databaseResponse) {
+			if (databaseResponse && databaseResponse.dbError) {
+				response.send(500, databaseResponse.errorMessage.toString());
+			} else {
+				response.send(200, cubeServer.returnCubeBySlotsOrdered());
+			}
 		}
 	};
 	
@@ -33,8 +37,12 @@ module.exports = function(app) {
 		cubeServer.reset();
 		cubeServer.compareClientToDB(request.body, comparisonFinished);
 		
-		function comparisonFinished() {
-			
+		function comparisonFinished(databaseResponse) {
+			if (databaseResponse.dbError) {
+				response.send(500, databaseResponse.errors.toString());
+			} else {
+				response.send(200, {success: true});
+			}
 		}
 	};
 };
