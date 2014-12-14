@@ -111,7 +111,7 @@ cubeServer.prototype.storeDatabaseSlotData = function(databaseData, callback) {
 	this.cubeBySlotsOrdered = finalJson;
 	this.cubeBySlotsKey = tempSlots;
 
-	callback();
+	callback(databaseData);
 };
 
 cubeServer.prototype.returnCubeBySlotsOrdered = function() {
@@ -124,13 +124,13 @@ cubeServer.prototype.compareClientToDB = function(clientData, callback) {
 		if (databaseData.dbError) {
 			callback(databaseData);
 		} else {
-			that.gatherChanges(clientData);
+			that.gatherChanges(clientData, callback);
 		}
 	});
 };
 
 cubeServer.prototype.gatherChanges = function(clientData, callback) {
-	var changeTypes = new changeType();
+	var changeTypes = new changeType(), currentSlotSequence = 5;
 	for (var i = 0; i < clientData.length; i++) {
 		var currSlot = clientData[i];
 		
@@ -155,8 +155,14 @@ cubeServer.prototype.gatherChanges = function(clientData, callback) {
 			}
 		}
 		
+		//Slot order change
+		this.slotChanges[currSlot.slotID] = new change();
+		this.slotChanges[currSlot.slotID].initialize(null, null, currSlot.slotID);
+		this.slotChanges[currSlot.slotID].slotSequence = currentSlotSequence;
+		currentSlotSequence += 5;
+		
+		//Slot name change
 		if (currSlot.slotName != this.cubeBySlotsKey[currSlot.slotID].slotName) {
-			this.slotChanges[currSlot.slotID] = new change();
 			this.slotChanges[currSlot.slotID].initialize(null, changeTypes.slotRename, currSlot.slotID);
 			this.slotChanges[currSlot.slotID].slotName = currSlot.slotName;
 		}
@@ -218,16 +224,19 @@ cubeServer.prototype.generateChangeSQL = function() {
 	for (var slotID in this.slotChanges) {
 		if (this.slotChanges.hasOwnProperty(slotID)) {
 			var slotChange = this.slotChanges[slotID];
-			slotChange.SQL = 'INSERT INTO dba.CubeSlotName (DisplayName, CubeSlotID, DateChanged) VALUES (\'' +
-				dbase.safeDBString(slotChange.slotName) + '\', \'' + slotID + '\', \'' + date.getFullYear() + '-' + (date.getMonth() + 1) + '-' +
-				date.getDate() + '\'); ';
+			if (slotChange.slotName) {
+				slotChange.SQL = 'INSERT INTO dba.CubeSlotName (DisplayName, CubeSlotID, DateChanged) VALUES (\'' +
+					dbase.safeDBString(slotChange.slotName) + '\', \'' + dbase.safeDBString(slotID) + '\', \'' + date.getFullYear() + '-' + (date.getMonth() + 1) + '-' +
+					date.getDate() + '\'); ';
+			}
+			slotChange.SQL += 'UPDATE dba.CubeSlot SET Sequence = \'' + dbase.safeDBString(slotChange.slotSequence) + '\' WHERE ID = \'' + dbase.safeDBString(slotID) + '\'; ';
 			this.numberOfTransactions++;
 		}
 	}
 };
 
 cubeServer.prototype.saveChanges = function(callback) {
-callback();
+callback({});
 return;
 	for (var cardID in this.cardsAdded) {
 		if (this.cardsAdded.hasOwnProperty(cardID)) {
@@ -259,7 +268,11 @@ cubeServer.prototype.executeSQL = function(sqlCommand, callback) {
 			that.errors.push(databaseData.errorMessage);
 		}
 		if (that.numTransactionsExecuted == that.numberOfTransactions) {
-			callback({dbError: true, errors: that.errors});
+			if (that.errors.length > 0) {
+				callback({dbError: true, errors: that.errors});
+			} else {
+				callback({dbError: false});
+			}
 		}
 	});
 };
@@ -293,10 +306,11 @@ var change = function () {
 	this.slotToID = -1;
 	this.SQL = '';
 	this.slotName = '';
+	this.slotSequence = -1;
 };
 change.prototype = {};
 
-change.prototype.initialize = function(cardID, changeType, slotID, slotName) {
+change.prototype.initialize = function(cardID, changeType, slotID) {
 	this.cardID = cardID;
 	this.changeType = changeType;
 	this.slotID = slotID;

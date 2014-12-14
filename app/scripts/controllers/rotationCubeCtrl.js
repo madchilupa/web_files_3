@@ -55,7 +55,13 @@ angular.module('WebFiles3App')
 	}
 	
 	$scope.saveChanges = function() {
-		$http.post('/cubeSave', $scope.displayData.slots, {})
+		var dataToSave = [];
+		for (var i = 0; i < $scope.displayData.slots.length; i++) {
+			if ($scope.displayData.slots[i].cards && $scope.displayData.slots[i].cards[0] && $scope.displayData.slots[i].cards[0].color == $scope.displayData.meta.colorSelected) {
+				dataToSave.push($scope.displayData.slots[i]);
+			}
+		}
+		$http.post('/cubeSave', dataToSave, {})
 			.success(function(data, status, headers, config) {
 			})
 			.error(function(data, status, headers, config) {
