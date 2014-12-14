@@ -38,6 +38,13 @@ angular.module('WebFiles3App')
 	$scope.stopDrag = function(a, b, c) {
 	}
 	
+	$scope.stopSlotDrag = function(event, draggedItem, droppedIndex) {
+		var draggedIndex = $(draggedItem.helper[0]).attr('slotIndex');
+		var temp = $scope.displayData.slots[droppedIndex];
+		$scope.displayData.slots[droppedIndex] = $scope.displayData.slots[draggedIndex];
+		$scope.displayData.slots[draggedIndex] = temp;
+	}
+	
 	$scope.colorButtonClicked = function(color) {
 		this.deselectOtherButtons(color);
 		$scope.displayData.meta.colorSelected = color;
