@@ -30,3 +30,4 @@ node app/server/server.js
 
 git bash
 cd d:/"my documents"/dropbox/web_files_3
+q to exit (end) tag

@@ -9,4 +9,4 @@
  * Main module of the application.
  */
 angular
-  .module('WebFiles3App', ['ngRoute', 'ngDragDrop', 'xeditable']);
+  .module('WebFiles3App', ['ngRoute', 'ngDragDrop', 'xeditable', 'ui.bootstrap']);

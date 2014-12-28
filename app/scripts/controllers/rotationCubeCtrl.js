@@ -8,7 +8,8 @@
  * Controller of the WebFiles3App
  */
 angular.module('WebFiles3App')
-  .controller('RotationCubeCtrl', function ($scope, $http) {
+  .controller('RotationCubeCtrl', function ($scope, $http, $modal) {
+	/** List of elligible cube **/
 	$http.get('/cubeList', {})
 		.success(function(data, status, headers, config) {
 			$scope.cubeList = {};
@@ -17,6 +18,8 @@ angular.module('WebFiles3App')
 		.error(function(data, status, headers, config) {
 			$scope.error = 'Error: ' + data;
 		});
+	
+	/** List of cards in selected cube **/
 	$http.get('/cubeView', {})
 		.success(function(data, status, headers, config) {
 			$scope.displayData = data;
@@ -35,24 +38,41 @@ angular.module('WebFiles3App')
 			$scope.error = 'Error: ' + data;
 		});
 	
+	/** Modal for adding a slot **/
+	$scope.openSlotModal = function () {
+		var modalSlotAdd = $modal.open({
+			templateUrl: 'views/rotationAddSlotView.html',
+			controller: 'RotationAddSlotCtrl',
+			size: 'lg',
+			resolve: {
+			}
+		});
+		
+		modalSlotAdd.result.then(function (/*selectedItem*/) {
+			//$scope.something = selectedItem;
+		}, function() {
+			//Modal dismissed
+		});
+	};
+	
 	$scope.stopDrag = function(a, b, c) {
-	}
+	};
 	
 	$scope.stopSlotDrag = function(event, draggedItem, droppedIndex) {
 		var draggedIndex = $(draggedItem.helper[0]).attr('slotIndex');
 		var temp = $scope.displayData.slots[droppedIndex];
 		$scope.displayData.slots[droppedIndex] = $scope.displayData.slots[draggedIndex];
 		$scope.displayData.slots[draggedIndex] = temp;
-	}
+	};
 	
 	$scope.colorButtonClicked = function(color) {
 		this.deselectOtherButtons(color);
 		$scope.displayData.meta.colorSelected = color;
-	}
+	};
 	
 	$scope.deselectOtherButtons = function(color) {
 		$('#buttonsColorSwitching label[color!=\'' + color + '\']').removeClass('active');
-	}
+	};
 	
 	$scope.saveChanges = function() {
 		var dataToSave = [];
@@ -66,5 +86,5 @@ angular.module('WebFiles3App')
 			})
 			.error(function(data, status, headers, config) {
 			});
-	}
+	};
   });
