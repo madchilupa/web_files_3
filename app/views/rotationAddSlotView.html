@@ -1,8 +1,33 @@
 <div class="modal-header">
-	<h3 class="modal-title">I'm a modal!</h3>
+	<h3 class="modal-title">Create a new slot for cards to be added</h3>
 </div>
 <div class="modal-body">
-	Add a slot
+	<table>
+		<tr>
+			<th>Color</th>
+			<th>Slot Name</th>
+			<th>Slot Type</th>
+			<th>Converted<br/>Mana Cost</th>
+		</tr>
+		<tr ng-repeat="slot in data.slots">
+			<td style="min-width: 160px;">
+				<select class="colorPickerModal">
+					<option ng-repeat="color in data.colors">{{color.name}}</option>
+				</select>
+			</td>
+			<td style="min-width: 160px;">
+				<span class="btn" editable-text="slot.name" buttons="no">{{slot.name || 'empty'}}</span>
+			</td>
+			<td style="min-width: 160px;">
+				<select class="typePickerModal">
+					<option ng-repeat="type in data.possibleTypes">{{type}}</option>
+				</select>
+			</td>
+			<td style="min-width: 160px;">
+				<span class="btn" editable-text="slot.cmc" buttons="no">{{slot.cmc || '0'}}</span>
+			</td>
+		</tr>
+	</table>
 </div>
 <div class="modal-footer">
 	<button class="btn btn-primary" ng-click="ok()">OK</button>

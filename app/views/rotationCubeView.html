@@ -5,13 +5,15 @@
 		<button type="button" class="btn btn-default" ng-click="openSlotModal();"><span class="glyphicon glyphicon-plus"></span></button>
 		<button type="button" class="btn btn-default" ng-click="alert('to do');"><span class="glyphicon glyphicon-minus"></span></button>
 	</div>
-	<select name="chosenCube">
-		<option ng-repeat="cube in cubeList.cube">{{cube.name}}</option>
-	</select>
 	<div class="btn-group" data-toggle="buttons" id="buttonsColorSwitching">
 		<label class="btn btn-default" ng-class="{'active': $index == 0}" color="{{color.name}}" ng-repeat="color in displayData.meta.colors" ng-click="colorButtonClicked(color.name)">
 			{{color.name}}
 		</label>
+	</div>
+	<div class="btn-group">
+		<select class="colorPicker" name="chosenCube">
+			<option ng-repeat="cube in cubeList.cube">{{cube.name}}</option>
+		</select>
 	</div>
 </div>
 
@@ -32,7 +34,7 @@
 	<div style="float:left; display:inline-block;">
 		<span style="clear:both; float:left; display:inline-block;" ng-repeat="slot in displayData.slots" ng-if="slot.cards[0].color == displayData.meta.colorSelected">
 			<span style="float:left;" ng-repeat="card in slot.cards">
-				<span style="float:left;" ng-if="card.draggable == true" class="btn btn-info btn-draggable btn-draggable-card"  data-drag="true" data-jqyoui-options="{revert: 'invalid'}" ng-model="slot.cards" jqyoui-draggable="{index: {{$index}}, placeholder: false, animate:true, onStop: 'stopDrag()'}">{{card.name}}</span>
+				<span style="float:left;" ng-if="card.draggable == true" class="btn btn-info btn-draggable btn-draggable-card"  data-drag="true" data-jqyoui-options="{revert: 'invalid'}" ng-model="slot.cards" jqyoui-draggable="{index: {{$index}}, placeholder: false, animate:true}">{{card.name}}</span>
 				<span style="float:left;" ng-if="card.draggable == false" class="btn btn-info" ng-disabled="card.draggable == false" ng-model="slot.cards">{{card.name}}</span>
 			</span>
 			<span style="float:left;">

@@ -8,12 +8,17 @@
  * Controller of the WebFiles3App
  */
 angular.module('WebFiles3App')
-  .controller('RotationCubeCtrl', function ($scope, $http, $modal) {
+  .controller('RotationCubeCtrl', function ($scope, $http, $modal, $timeout) {
 	/** List of elligible cube **/
 	$http.get('/cubeList', {})
 		.success(function(data, status, headers, config) {
 			$scope.cubeList = {};
 			$scope.cubeList.cube = data;
+			
+			//The DOM doesn't seem to be ready at this point, do a sloppy $timeout here
+			$timeout(function() {
+				$('.colorPicker').selectpicker();
+			}, 0);
 		})
 		.error(function(data, status, headers, config) {
 			$scope.error = 'Error: ' + data;
@@ -40,12 +45,35 @@ angular.module('WebFiles3App')
 	
 	/** Modal for adding a slot **/
 	$scope.openSlotModal = function () {
+		var dataToSend = {
+			colors: $scope.displayData.meta.colors,
+			possibleTypes: [],
+			slots: []
+		};
+		dataToSend.possibleTypes.push('Creature');
+		dataToSend.possibleTypes.push('Spell');
+		dataToSend.slots.push({
+			name: 'new',
+			type: 'creature',
+			cmc: '1'
+		});
+		
 		var modalSlotAdd = $modal.open({
 			templateUrl: 'views/rotationAddSlotView.html',
 			controller: 'RotationAddSlotCtrl',
 			size: 'lg',
 			resolve: {
+				data: function() {
+					return dataToSend;
+				}
 			}
+		});
+		
+		modalSlotAdd.opened.then(function() {
+			$timeout(function() {
+				$('.colorPickerModal').selectpicker();
+				$('.typePickerModal').selectpicker();
+			}, 0);
 		});
 		
 		modalSlotAdd.result.then(function (/*selectedItem*/) {
