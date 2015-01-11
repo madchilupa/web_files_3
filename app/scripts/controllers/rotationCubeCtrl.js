@@ -53,8 +53,7 @@ angular.module('WebFiles3App')
 		dataToSend.possibleTypes.push('Creature');
 		dataToSend.possibleTypes.push('Spell');
 		dataToSend.slots.push({
-			name: 'new',
-			type: 'creature',
+			type: 'Creature',
 			cmc: '1'
 		});
 		
@@ -76,8 +75,21 @@ angular.module('WebFiles3App')
 			}, 0);
 		});
 		
-		modalSlotAdd.result.then(function (/*selectedItem*/) {
-			//$scope.something = selectedItem;
+		modalSlotAdd.result.then(function (modalData) {
+			//modalData.slots[0].cmc		.name		.type
+			if (modalData && modalData.slots && modalData.slots[0]) {
+				var slotToSave = {
+					cmc: modalData.slots[0].cmc,
+					slotName: modalData.slots[0].name,
+					slotType: modalData.slots[0].type,
+					color: modalData.slots[0].color
+				};
+				$http.post('/addSlot', slotToSave, {})
+					.success(function(data, status, headers, config) {
+					})
+					.error(function(data, status, headers, config) {
+					});
+			}
 		}, function() {
 			//Modal dismissed
 		});

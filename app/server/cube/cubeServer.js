@@ -277,6 +277,91 @@ cubeServer.prototype.executeSQL = function(sqlCommand, callback) {
 	});
 };
 
+cubeServer.prototype.createNewSlot = function(clientData, callback) {
+	this.generateSlotName(clientData, callback);
+};
+
+cubeServer.prototype.generateSlotName = function(slotData, callback) {
+	// color + converted mana cost + creature/spell + increment
+	var that = this;
+	function saveSlotToDB(slotCount) {
+		var newCount;
+		if (!slotCount[0]) {
+			newCount = '01';
+		} else {
+			newCount = that.countToTwoDigits(slotCount[0]['slotCount']);
+		}
+		
+		var insertSQL =
+			'INSERT INTO dba.CubeSlot(CubeID, DateAdded, GeneratedName, Sequence) ' +
+			'SELECT 11, current date, \'' + name + newCount + '\', max(Sequence) + 5 ' +
+			'FROM dba.CubeSlot ' +
+			'WHERE CubeID = 11;';
+		console.log(insertSQL);
+	}
+	
+	var name = this.getColorAbbr(slotData.color) + slotData.cmc + this.getTypeAbbr(slotData.slotType);
+	var cmd = 'SELECT isnull(count(*), 0) + 1 as slotCount FROM dba.CubeSlot WHERE GeneratedName like \'' + dbase.safeDBString(name) + '%\' and CubeID=11;';
+	
+	dbase.dbResults(cmd, function(databaseData) {
+		if (databaseData.dbError) {
+			callback(databaseData);
+		} else {
+			saveSlotToDB(databaseData, callback);
+		}
+	});
+};
+
+cubeServer.prototype.countToTwoDigits = function(numFromDB) {
+	if (numFromDB < 10) {
+		return '0' + numFromDB;
+	} else {
+		return numFromDB;
+	}
+};
+
+cubeServer.prototype.getColorAbbr = function(color) {
+	if (!color || color == '') {
+		return 'w';
+	}
+	
+	switch (color.toUpperCase()) {
+		case 'WHITE':
+			return 'w';
+		case 'BLUE':
+			return 'u';
+		case 'BLACK':
+			return 'b';
+		case 'RED':
+			return 'r'
+		case 'GREEN':
+			return 'g';
+		case 'COLORLESS':
+			return 'c';
+		case 'MULTICOLOR':
+			return 'm';
+		case 'LAND':
+			return 'l';
+		default:
+			return 'w';
+	}
+};
+
+cubeServer.prototype.getTypeAbbr = function(type) {
+	if (!type || type == '') {
+		return 'c';
+	}
+	
+	switch (type.toUpperCase()) {
+		case 'CREATURE':
+			return 'c';
+		case 'SPELL':
+			return 's';
+		default:
+			return 'c';
+	}
+};
+
 var cube = function() {
 	this.name = '';
 	this.id = -1;
@@ -352,6 +437,10 @@ function compareClientToDB(clientData, callback) {
 	return serverObject.compareClientToDB(clientData, callback);
 };
 
+function createNewSlot(clientData, callback) {
+	return serverObject.createNewSlot(clientData, callback);
+};
+
 var serverObject = new cubeServer();
 module.exports.gatherListOfRotationEligibleCubes = gatherListOfRotationEligibleCubes;
 module.exports.reset = reset;
@@ -360,3 +449,4 @@ module.exports.isValidCubeList = isValidCubeList;
 module.exports.cardsInEachSlot = cardsInEachSlot;
 module.exports.returnCubeBySlotsOrdered = returnCubeBySlotsOrdered;
 module.exports.compareClientToDB = compareClientToDB;
+module.exports.createNewSlot = createNewSlot;

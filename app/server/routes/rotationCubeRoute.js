@@ -6,6 +6,7 @@ module.exports = function(app) {
 	app.get('/cubeList', gatherCubeList);
 	app.get('/cubeView', viewCubeContents);
 	app.post('/cubeSave', saveSlotChanges);
+	app.post('/addSlot', createNewSlot);
 	
 	function gatherCubeList(request, response) {
 		cubeServer.reset();
@@ -42,6 +43,19 @@ module.exports = function(app) {
 				response.send(500, databaseResponse.errors.toString());
 			} else {
 				response.send(200, {success: true});
+			}
+		}
+	};
+	
+	function createNewSlot(request, response) {
+		cubeServer.reset();
+		cubeServer.createNewSlot(request.body, slotCreated);
+		
+		function slotCreated(databaseResponse) {
+			if (databaseResponse.dbError) {
+				response.send(500, databaseResponse.errors.toString());
+			} else {
+				response.send(200, {success: true, generatedSlotName: databaseResponse.generatedSlotName});
 			}
 		}
 	};

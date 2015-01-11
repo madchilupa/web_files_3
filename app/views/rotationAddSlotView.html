@@ -11,7 +11,7 @@
 		</tr>
 		<tr ng-repeat="slot in data.slots">
 			<td style="min-width: 160px;">
-				<select class="colorPickerModal">
+				<select class="colorPickerModal" ng-model="slot.color">
 					<option ng-repeat="color in data.colors">{{color.name}}</option>
 				</select>
 			</td>
@@ -19,7 +19,7 @@
 				<span class="btn" editable-text="slot.name" buttons="no">{{slot.name || 'empty'}}</span>
 			</td>
 			<td style="min-width: 160px;">
-				<select class="typePickerModal">
+				<select class="typePickerModal" ng-model="slot.type">
 					<option ng-repeat="type in data.possibleTypes">{{type}}</option>
 				</select>
 			</td>
