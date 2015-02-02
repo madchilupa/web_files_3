@@ -26,7 +26,7 @@ angular.module('WebFiles3App')
 	
 	/** List of cards in selected cube **/
 	$http.get('/cubeView', {})
-		.success(function(data, status, headers, config) {
+		.success(function(data, status, headers, config) {debugger;
 			$scope.displayData = data;
 			
 			$scope.displayData.meta.colors = [];
@@ -86,13 +86,40 @@ angular.module('WebFiles3App')
 				};
 				$http.post('/addSlot', slotToSave, {})
 					.success(function(data, status, headers, config) {
+						if (data.newSlot.generatedSlotName) {
+							$scope.alerts.push({type: 'success', msg: 'Slot ' + data.newSlot.generatedSlotName + ' added to the cube'});
+							var newSlot = {
+								cards: [],//add generated slot name as a card
+								colorID: data.newSlot.colorID,
+								generatedSlotName: data.newSlot.generatedSlotName,
+								slotID: data.newSlot.slotID,
+								slotName: data.newSlot.slotName
+							};
+							newSlot.cards.push({
+								name: data.newSlot.generatedSlotName,
+								draggable: false
+							});
+							$scope.displayData.slots.push(newSlot);
+						} else {
+							$scope.alerts.push({type: 'success', msg: 'Slot added to the cube. There was a problem retrieving data from the server. Please refresh page to view the new slot.'});
+						}
 					})
 					.error(function(data, status, headers, config) {
+						if (data.errors) {
+							$scope.alerts.push({type: 'danger', msg: 'There was an error creating the cube slot. ' + data.errors.toString()});
+						} else {
+							$scope.alerts.push({type: 'danger', msg: 'There was an error creating the cube slot.'});
+						}
 					});
 			}
 		}, function() {
 			//Modal dismissed
 		});
+	};
+	
+	$scope.alerts = [];
+	$scope.closeAlert = function(index) {
+		$scope.alerts.splice(index, 1);
 	};
 	
 	$scope.stopDrag = function(a, b, c) {

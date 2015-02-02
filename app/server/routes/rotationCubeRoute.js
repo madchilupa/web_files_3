@@ -53,9 +53,9 @@ module.exports = function(app) {
 		
 		function slotCreated(databaseResponse) {
 			if (databaseResponse.dbError) {
-				response.send(500, databaseResponse.errors.toString());
+				response.send(500, databaseResponse);
 			} else {
-				response.send(200, {success: true, generatedSlotName: databaseResponse.generatedSlotName});
+				response.send(200, {success: true, newSlot: databaseResponse});
 			}
 		}
 	};

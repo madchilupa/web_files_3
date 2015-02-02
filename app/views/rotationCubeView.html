@@ -1,4 +1,5 @@
 <div>{{error}}</div>
+<alert ng-repeat="alert in alerts" type={{alert.type}} close="closeAlert($index)">{{alert.msg}}</alert>
 <div class="btn-toolbar" role="toolbar">
 	<div class="btn-group btn-group">
 		<button type="button" class="btn btn-default" ng-click="saveChanges();"><span class="glyphicon glyphicon-floppy-disk"></span></button>
@@ -6,7 +7,7 @@
 		<button type="button" class="btn btn-default" ng-click="alert('to do');"><span class="glyphicon glyphicon-minus"></span></button>
 	</div>
 	<div class="btn-group" data-toggle="buttons" id="buttonsColorSwitching">
-		<label class="btn btn-default" ng-class="{'active': $index == 0}" color="{{color.name}}" ng-repeat="color in displayData.meta.colors" ng-click="colorButtonClicked(color.name)">
+		<label class="btn btn-default" ng-class="{'active': $index == 0}" color="{{color.ID}}" ng-repeat="color in displayData.meta.colors" ng-click="colorButtonClicked(color.ID)">
 			{{color.name}}
 		</label>
 	</div>
@@ -19,7 +20,7 @@
 
 <div>
 	<div style="float:left; display:inline-block;">
-		<div style="clear:both;" ng-repeat="slot in displayData.slots" ng-if="slot.cards[0].color == displayData.meta.colorSelected">
+		<div style="clear:both;" ng-repeat="slot in displayData.slots" ng-if="slot.colorID == displayData.meta.colorSelected">
 			<span class="btn btn-draggable-slot" style="float:left;" slotIndex="{{$index}}" data-drag="true" data-jqyoui-options="{revert: true}" ng-model="displayData.slots" jqyoui-draggable="{index: {{$index}}, placeholder: false, animate:true}">
 				<span class="glyphicon glyphicon-align-justify"></span>
 				
@@ -32,7 +33,7 @@
 		</div>
 	</div>
 	<div style="float:left; display:inline-block;">
-		<span style="clear:both; float:left; display:inline-block;" ng-repeat="slot in displayData.slots" ng-if="slot.cards[0].color == displayData.meta.colorSelected">
+		<span style="clear:both; float:left; display:inline-block;" ng-repeat="slot in displayData.slots" ng-if="slot.colorID == displayData.meta.colorSelected">
 			<span style="float:left;" ng-repeat="card in slot.cards">
 				<span style="float:left;" ng-if="card.draggable == true" class="btn btn-info btn-draggable btn-draggable-card"  data-drag="true" data-jqyoui-options="{revert: 'invalid'}" ng-model="slot.cards" jqyoui-draggable="{index: {{$index}}, placeholder: false, animate:true}">{{card.name}}</span>
 				<span style="float:left;" ng-if="card.draggable == false" class="btn btn-info" ng-disabled="card.draggable == false" ng-model="slot.cards">{{card.name}}</span>

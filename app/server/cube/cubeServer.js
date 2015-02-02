@@ -44,15 +44,28 @@ cubeServer.prototype.cardsInEachSlot = function(callback) {
 		'BEGIN ' +
 		'declare @date date; ' +
 		'declare @cubeID integer; ' +
+        'declare local temporary table slotContents( ' +
+        '    cardName varchar(150), ' +
+        '    cardID integer, ' +
+        '    slotGeneratedName varchar(50), ' +
+        '    slotID integer, ' +
+        '    slotSequence integer, ' +
+        '    slotColorID integer, ' +
+        '    slotName varchar(50), ' +
+        '    color varchar(25) ' +
+        ') not transactional; ' +
+
 		'set @date = current date; ' +
 		'set @cubeID = 11; ' +
 
+        'INSERT INTO slotContents (cardName, cardID, slotGeneratedName, slotID, slotSequence, SlotColorID, slotName, color) ' +
+        'WITH cardsInCube as ( ' +
 		'SELECT c.Name, c.id as cardID, ' +
 		'	(SELECT isnull(sum(Quantity), 0) FROM dba.CubeContents WHERE CubeID = @cubeID and CardID = c.ID and AddDel = \'A\' and  ' +
 		'		ChangeDate <= @date and isnull(SlotID, 0) = isnull(cc.SlotID, 0)) -  ' +
 		'	(SELECT isnull(sum(Quantity), 0) FROM dba.CubeContents WHERE CubeID = @cubeID and CardID = c.ID and AddDel = \'D\' and  ' +
 		'		ChangeDate <= @date and isnull(SlotID, 0) = isnull(cc.SlotID, 0)) as total, ' +
-		'	cs.GeneratedName, cs.ID as SlotID, isnull(cs.Sequence, 99999) as SlotSequence, ' +
+		'	cs.GeneratedName, cs.ID as SlotID, isnull(cs.Sequence, 99999) as SlotSequence, cs.ColorID as SlotColorID, ' +
 		'	(SELECT FIRST DisplayName FROM dba.CubeSlotName WHERE isnull(CubeSlotID, 0) = isnull(cc.SlotID, 0) and DateChanged <= @date ORDER BY DateChanged) as SlotName, ' +
 		'	if (SELECT count(*) from dba.CubeCardHasColorTranslation cchct WHERE cchct.CardID = c.ID and cchct.CubeID = @cubeID) > 1 then \'Multicolor\' ' +
 		'	else if EXISTS(SELECT 1 FROM dba.CubeCardHasColorTranslation cchct WHERE cchct.CardID = c.ID and cchct.CubeID = @cubeID) ' +
@@ -64,9 +77,34 @@ cubeServer.prototype.cardsInEachSlot = function(callback) {
 		'FROM dba.CubeContents cc ' +
 		'JOIN dba.Card c on c.ID = cc.CardID ' +
 		'LEFT OUTER JOIN dba.CubeSlot cs on cs.ID = cc.SlotID ' +
-		'WHERE cc.CubeID = @cubeID and total > 0 ' +
-		'ORDER BY SlotSequence, cs.GeneratedName, c.Name ASC;' +
-		'END';
+		'WHERE cc.CubeID = @cubeID and total > 0) ' +
+        'SELECT Name, cardID, GeneratedName, SlotID, SlotSequence, SlotColorID, SlotName, color ' +
+        'FROM cardsInCube; ' +
+
+        'INSERT INTO slotContents (cardName, cardID, slotGeneratedName, slotID, slotSequence, SlotColorID, slotName, color) ' +
+        'SELECT null, null, cs.GeneratedName, cs.ID, isnull(cs.Sequence, 99999), cs.ColorID, ' +
+        '    (SELECT FIRST DisplayName FROM dba.CubeSlotName WHERE isnull(CubeSlotID, 0) = isnull(cs.ID, 0) and DateChanged <= @date ORDER BY DateChanged), ' +
+        '    null ' +
+        'FROM dba.CubeSlot cs ' +
+        'WHERE cs.CubeID = @cubeID and cs.ID not in (SELECT DISTINCT slotID FROM slotContents); ' +
+
+        'INSERT INTO slotContents (cardName, cardID, slotGeneratedName, slotID, slotSequence, SlotColorID, slotName, color) ' +
+        'WITH cardsWithoutSlot as ( ' +
+        'SELECT c.Name, c.ID as cardID, null as GeneratedName, null as SlotID, null as SlotSequence, null as SlotColorID, null as slotName, null as color, ' +
+        '   (SELECT isnull(sum(Quantity), 0) FROM dba.CubeContents WHERE CubeID = @cubeID and CardID = c.ID and AddDel = \'A\' and  ' +
+		'		ChangeDate <= @date and isnull(SlotID, 0) = isnull(cc.SlotID, 0)) -  ' +
+		'	(SELECT isnull(sum(Quantity), 0) FROM dba.CubeContents WHERE CubeID = @cubeID and CardID = c.ID and AddDel = \'D\' and  ' +
+		'		ChangeDate <= @date and isnull(SlotID, 0) = isnull(cc.SlotID, 0)) as total ' +
+        'FROM dba.CubeContents cc ' +
+        'JOIN dba.Card c on c.ID = cc.CardID ' +
+        'WHERE cc.CubeID = @cubeID and total > 0 and cc.SlotID is null) ' +
+        'SELECT Name, cardID, GeneratedName, SlotID, SlotSequence, SlotColorID, SlotName, color ' +
+        'FROM cardsWithoutSlot; ' +
+
+        'SELECT * ' +
+        'FROM slotContents ' +
+        'ORDER BY slotSequence, slotGeneratedName, cardName ASC ' +
+		'END'
 	dbase.dbResults(cmd, function(databaseData) {
 		if (databaseData.dbError) {
 			callback(databaseData);
@@ -79,25 +117,26 @@ cubeServer.prototype.cardsInEachSlot = function(callback) {
 cubeServer.prototype.storeDatabaseSlotData = function(databaseData, callback) {
 	var tempSlots = {}, slotOrder = [];
 	for (var i = 0; i < databaseData.length; i++) {
-		var slotID = databaseData[i]['SlotID'];
+		var slotID = databaseData[i]['slotID'];
 		if (!tempSlots[slotID]) {
 			tempSlots[slotID] = new slot();
 			tempSlots[slotID].slotID = slotID;
-			tempSlots[slotID].generatedSlotName = databaseData[i]['GeneratedName'];
-			tempSlots[slotID].slotName = databaseData[i]['SlotName'];
+			tempSlots[slotID].generatedSlotName = databaseData[i]['slotGeneratedName'];
+			tempSlots[slotID].slotName = databaseData[i]['slotName'];
+			tempSlots[slotID].colorID = databaseData[i]['slotColorID'];
 			slotOrder.push(slotID);
 			var tempCard = new card();
-			tempCard.name = databaseData[i]['GeneratedName'];
-			tempCard.color = databaseData[i]['color'];
+			tempCard.name = databaseData[i]['slotGeneratedName'];
 			tempCard.draggable = false;
 			tempSlots[slotID].cards.push(tempCard);
 		}
-		var tempCard = new card();
-		tempCard.name = databaseData[i]['Name'];
-		tempCard.cardID = databaseData[i]['cardID'];
-		tempCard.color = databaseData[i]['color'];
-		tempCard.draggable = true;
-		tempSlots[slotID].cards.push(tempCard);
+		if (databaseData[i]['cardName']) {
+			var tempCard = new card();
+			tempCard.name = databaseData[i]['cardName'];
+			tempCard.cardID = databaseData[i]['cardID'];
+			tempCard.draggable = true;
+			tempSlots[slotID].cards.push(tempCard);
+		}
 	}
 	//finished loading data, format it for client-side
 	var finalJson = {};
@@ -107,7 +146,7 @@ cubeServer.prototype.storeDatabaseSlotData = function(databaseData, callback) {
 	}
 	
 	finalJson.meta = {};
-	finalJson.meta.colorSelected = 'White';
+	finalJson.meta.colorSelected = 1;
 	this.cubeBySlotsOrdered = finalJson;
 	this.cubeBySlotsKey = tempSlots;
 
@@ -283,7 +322,86 @@ cubeServer.prototype.createNewSlot = function(clientData, callback) {
 
 cubeServer.prototype.generateSlotName = function(slotData, callback) {
 	// color + converted mana cost + creature/spell + increment
-	var that = this;
+	var that = this, generatedName;
+	function getNewSlotID(slotCreationResponse) {
+		function databaseExecuted(identityResponse) {
+			var newSlotID = -1;
+			if (identityResponse && !identityResponse.dbError && identityResponse[0]) {
+				newSlotID = identityResponse[0]['Identity'];
+			}
+			if (identityResponse.dbError) {
+				var responseObj = {
+					dbError: true,
+					errors: []
+				};
+				responseObj.errors.push('Error retrieving identifier for new cube slot');
+				if (identityResponse.errorMessage) {
+					responseObj.errors.push(identityResponse.errorMessage);
+				}
+				callback(responseObj);
+			} else if (newSlotID == -1) {
+				var toClient = {};
+				toClient.generatedSlotName = generatedName;
+				callback(toClient);
+			} else {
+				var insertNameSql = 
+					'INSERT INTO dba.CubeSlotName(CubeSlotID, DisplayName, DateChanged) VALUES ' +
+					'(\'' + dbase.safeDBString(newSlotID) + '\', \'' + dbase.safeDBString(slotData.slotName) + '\', current date);';
+				dbase.executeCommand(insertNameSql, function(nameResult) {
+					if (!nameResult || nameResult.dbError) {
+						var responseObj = {
+							dbError: true,
+							errors: []
+						};
+						responseObj.errors.push('Error creating name for cube slot');
+						if (nameResult.errorMessage) {
+							responseObj.errors.push(nameResult.errorMessage);
+						}
+						callback(responseObj);
+					} else {
+						var sqlCommand = 
+							'SELECT cs.ColorID, (SELECT FIRST DisplayName FROM dba.CubeSlotName WHERE isnull(CubeSlotID, 0) = isnull(cs.ID, 0) and ' +
+							'	DateChanged <= current date ORDER BY DateChanged) as SlotName ' +
+							'FROM dba.CubeSlot cs ' +
+							'WHERE cs.ID = \'' + dbase.safeDBString(newSlotID) + '\';';
+						dbase.dbResults(sqlCommand, function(newSlotDataResponse) {
+							if (!newSlotDataResponse || newSlotDataResponse.dbError) {	
+								var toClient = {};
+								toClient.generatedSlotName = generatedName;
+								callback(toClient);
+							} else if (newSlotDataResponse[0] && newSlotDataResponse[0]['ColorID']) {
+								var toClient = {};
+								toClient.generatedSlotName = generatedName;
+								toClient.colorID = newSlotDataResponse[0]['ColorID'];
+								toClient.slotID = newSlotID;
+								if (newSlotDataResponse[0]['SlotName']) {
+									toClient.slotName = newSlotDataResponse[0]['SlotName'];
+								}
+								callback(toClient);
+							} else {
+								var toClient = {};
+								toClient.generatedSlotName = generatedName;
+								callback(toClient);
+							}
+						});
+					}
+				});
+			}
+		};
+		
+		if (!slotCreationResponse) {
+			var responseObj = {
+				dbError: true,
+				errors: []
+			};
+			responseObj.errors.push('No response received from database after creation of cube slot');
+			callback(responseObj);
+		} else {
+			//callback(slotCreationResponse);
+			var identitySql = 'SELECT max(ID) as Identity FROM dba.CubeSlot';
+			dbase.dbResults(identitySql, databaseExecuted);
+		}
+	};
 	function saveSlotToDB(slotCount) {
 		var newCount;
 		if (!slotCount[0]) {
@@ -291,18 +409,18 @@ cubeServer.prototype.generateSlotName = function(slotData, callback) {
 		} else {
 			newCount = that.countToTwoDigits(slotCount[0]['slotCount']);
 		}
+		generatedName = name + newCount;
 		
 		var insertSQL =
-			'INSERT INTO dba.CubeSlot(CubeID, DateAdded, GeneratedName, Sequence) ' +
-			'SELECT 11, current date, \'' + name + newCount + '\', max(Sequence) + 5 ' +
+			'INSERT INTO dba.CubeSlot(CubeID, DateAdded, GeneratedName, Sequence, ColorID) ' +
+			'SELECT 11, current date, \'' + generatedName + '\', max(Sequence) + 5, (SELECT isnull(ID, 0) FROM dba.Color WHERE DisplayText = \'' + dbase.safeDBString(slotData.color) + '\') ' +
 			'FROM dba.CubeSlot ' +
 			'WHERE CubeID = 11;';
-		console.log(insertSQL);
-	}
+		dbase.executeCommand(insertSQL, getNewSlotID);
+	};
 	
 	var name = this.getColorAbbr(slotData.color) + slotData.cmc + this.getTypeAbbr(slotData.slotType);
 	var cmd = 'SELECT isnull(count(*), 0) + 1 as slotCount FROM dba.CubeSlot WHERE GeneratedName like \'' + dbase.safeDBString(name) + '%\' and CubeID=11;';
-	
 	dbase.dbResults(cmd, function(databaseData) {
 		if (databaseData.dbError) {
 			callback(databaseData);
