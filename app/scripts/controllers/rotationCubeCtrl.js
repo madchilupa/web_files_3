@@ -32,8 +32,12 @@ angular.module('WebFiles3App')
 	//** List of colors in this cube **/
 	$http.get('/cubeColors', {})
 		.success(function(data, status, headers, config) {
-			$scope.meta.colors = [];
-			$scope.meta.colors = data.colorList;
+			$scope.meta.colorArray = [];
+			$scope.meta.colorArray = data.colorList;
+			$scope.meta.colorDefinition = {};
+			$($scope.meta.colorArray).each(function(index, value) {
+				$scope.meta.colorDefinition[$scope.meta.colorArray[index].ID] = value;
+			});
 		})
 		.error(function(data, status, headers, config) {
 			$scope.alerts.push({type: 'danger', msg: 'Error: ' + data});
@@ -51,6 +55,9 @@ angular.module('WebFiles3App')
 	/** Modal for deleting a slot **/
 	$scope.openDeleteModal = function() {
 		var dataToSend = {
+			meta: {
+				colors: $scope.meta.colorDefinition
+			}
 		};
 		
 		var modalSlotDelete = $modal.open({
@@ -76,7 +83,7 @@ angular.module('WebFiles3App')
 	/** Modal for adding a slot **/
 	$scope.openSlotModal = function () {
 		var dataToSend = {
-			colors: $scope.meta.colors,
+			colors: $scope.meta.colorArray,
 			colorSelected: $scope.meta.colorSelected,
 			possibleTypes: [],
 			slots: []

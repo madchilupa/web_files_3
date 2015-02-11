@@ -5,11 +5,13 @@
 <table width="50%">
 	<tr>
 		<th>Delete?</th>
+		<th>Color</th>
 		<th></th>
 		<th>Name</th>
 	</tr>
 	<tr ng-repeat="slot in slotList.slotList">
 		<td><input type="checkbox" ng-model="slot.checked"/></td>
+		<td>{{data.meta.colors[slot.ColorID].name}}</td>
 		<td>{{slot.GeneratedName}}</td>
 		<td>{{slot.DisplayName}}</td>
 	</tr>
