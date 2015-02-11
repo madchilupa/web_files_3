@@ -39,6 +39,18 @@ cubeServer.prototype.returnCubeList = function() {
 	return this.cubeList;
 };
 
+cubeServer.prototype.colorsInCube = function(callback) {
+	var cmd = 
+		'SELECT DISTINCT co.ID, isnull(co.Abbreviation, co.DisplayText) as abbr, co.DisplayText as name, co.Sequence ' +
+		'FROM dba.CubeSlot cs ' +
+		'JOIN dba.Color co on co.ID = cs.ColorID ' +
+		'WHERE cs.CubeID = 11 ' +
+		'ORDER BY co.Sequence;';
+	dbase.dbResults(cmd, function(databaseData) {
+		callback(databaseData);
+	});
+};
+
 cubeServer.prototype.cardsInEachSlot = function(callback) {
 	var that = this, cmd =
 		'BEGIN ' +
@@ -145,12 +157,36 @@ cubeServer.prototype.storeDatabaseSlotData = function(databaseData, callback) {
 		finalJson.slots.push(tempSlots[slotOrder[i]]);
 	}
 	
-	finalJson.meta = {};
-	finalJson.meta.colorSelected = 1;
 	this.cubeBySlotsOrdered = finalJson;
 	this.cubeBySlotsKey = tempSlots;
 
 	callback(databaseData);
+};
+
+cubeServer.prototype.elligibleSlotsForDeletion = function(callback) {
+	var cmd = 
+		'BEGIN ' +
+		'declare @date date; ' +
+		'declare @cubeID integer; ' +
+
+		'set @date = current date; ' +
+		'set @cubeID = 11; ' +
+
+		'SELECT cs.ID, cs.GeneratedName, cs.ColorID, cs.Sequence, ' +
+		'	(SELECT FIRST DisplayName FROM dba.CubeSlotName WHERE CubeSlotID = cs.ID and DateChanged <= @date ORDER BY DateChanged DESC) ' +
+		'FROM dba.CubeSlot cs ' +
+		'WHERE cs.CubeID = @cubeID and cs.ID not in (SELECT DISTINCT cc.SlotID ' +
+		'	FROM dba.CubeContents cc ' +
+		'	JOIN dba.Card c on c.ID = cc.CardID ' +
+		'	WHERE cc.CubeID = @cubeID and (SELECT isnull(sum(Quantity), 0) FROM dba.CubeContents WHERE CubeID = @cubeID and CardID = c.ID and AddDel = \'A\' and ' +
+		'			ChangeDate <= @date) - ' +
+		'		(SELECT isnull(sum(Quantity), 0) FROM dba.CubeContents WHERE CubeID = @cubeID and CardID = c.ID and AddDel = \'D\' and ' +
+		'			ChangeDate <= @date) > 0 ) ' +
+
+		'END '
+	dbase.dbResults(cmd, function(databaseData) {
+		callback(databaseData);
+	});
 };
 
 cubeServer.prototype.returnCubeBySlotsOrdered = function() {
@@ -543,8 +579,16 @@ function isValidCubeList() {
 	return serverObject.isValidCubeList();
 };
 
+function colorsInCube(callback) {
+	return serverObject.colorsInCube(callback);
+};
+
 function cardsInEachSlot(callback) {
 	return serverObject.cardsInEachSlot(callback);
+};
+
+function elligibleSlotsForDeletion(callback) {
+	return serverObject.elligibleSlotsForDeletion(callback);
 };
 
 function returnCubeBySlotsOrdered() {
@@ -564,7 +608,9 @@ module.exports.gatherListOfRotationEligibleCubes = gatherListOfRotationEligibleC
 module.exports.reset = reset;
 module.exports.returnCubeList = returnCubeList;
 module.exports.isValidCubeList = isValidCubeList;
+module.exports.colorsInCube = colorsInCube;
 module.exports.cardsInEachSlot = cardsInEachSlot;
+module.exports.elligibleSlotsForDeletion = elligibleSlotsForDeletion;
 module.exports.returnCubeBySlotsOrdered = returnCubeBySlotsOrdered;
 module.exports.compareClientToDB = compareClientToDB;
 module.exports.createNewSlot = createNewSlot;

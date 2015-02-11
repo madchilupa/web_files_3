@@ -9,6 +9,11 @@
  */
 angular.module('WebFiles3App')
   .controller('RotationCubeCtrl', function ($scope, $http, $modal, $timeout) {
+	$scope.meta = {};
+	$scope.meta.colorSelected = 1;
+	
+	$scope.displayData = {};
+	
 	/** List of elligible cube **/
 	$http.get('/cubeList', {})
 		.success(function(data, status, headers, config) {
@@ -21,32 +26,58 @@ angular.module('WebFiles3App')
 			}, 0);
 		})
 		.error(function(data, status, headers, config) {
-			$scope.error = 'Error: ' + data;
+			$scope.alerts.push({type: 'danger', msg: 'Error: ' + data});
+		});
+	
+	//** List of colors in this cube **/
+	$http.get('/cubeColors', {})
+		.success(function(data, status, headers, config) {
+			$scope.meta.colors = [];
+			$scope.meta.colors = data.colorList;
+		})
+		.error(function(data, status, headers, config) {
+			$scope.alerts.push({type: 'danger', msg: 'Error: ' + data});
 		});
 	
 	/** List of cards in selected cube **/
 	$http.get('/cubeView', {})
-		.success(function(data, status, headers, config) {debugger;
+		.success(function(data, status, headers, config) {
 			$scope.displayData = data;
-			
-			$scope.displayData.meta.colors = [];
-			$scope.displayData.meta.colors.push({name: 'White', ID: 1});
-			$scope.displayData.meta.colors.push({name: 'Blue', ID: 2});
-			$scope.displayData.meta.colors.push({name: 'Black', ID: 3});
-			$scope.displayData.meta.colors.push({name: 'Red', ID: 4});
-			$scope.displayData.meta.colors.push({name: 'Green', ID: 5});
-			$scope.displayData.meta.colors.push({name: 'Colorless', ID: 6});
-			$scope.displayData.meta.colors.push({name: 'Multicolor', ID: 7});
-			$scope.displayData.meta.colors.push({name: 'Land', ID: 8});
 		})
 		.error(function(data, status, headers, config) {
-			$scope.error = 'Error: ' + data;
+			$scope.alerts.push({type: 'danger', msg: 'Error: ' + data});
 		});
+	
+	/** Modal for deleting a slot **/
+	$scope.openDeleteModal = function() {
+		var dataToSend = {
+		};
+		
+		var modalSlotDelete = $modal.open({
+			templateUrl: 'views/rotationDeleteSlotView.html',
+			controller: 'RotationDeleteSlotCtrl',
+			size: 'lg',
+			resolve: {
+				data: function() {
+					return dataToSend;
+				}
+			}
+		});
+		
+		modalSlotDelete.opened.then(function() {
+		});
+		
+		modalSlotDelete.result.then(function (modalData) {
+		}, function () {
+			//Modal dismissed
+		});
+	};
 	
 	/** Modal for adding a slot **/
 	$scope.openSlotModal = function () {
 		var dataToSend = {
-			colors: $scope.displayData.meta.colors,
+			colors: $scope.meta.colors,
+			colorSelected: $scope.meta.colorSelected,
 			possibleTypes: [],
 			slots: []
 		};
@@ -72,8 +103,16 @@ angular.module('WebFiles3App')
 			$timeout(function() {
 				$('.colorPickerModal').selectpicker();
 				$('.typePickerModal').selectpicker();
+				modalSlotAdd.selectCorrectColor();
 			}, 0);
 		});
+		
+		modalSlotAdd.selectCorrectColor = function() {
+			var colorTextSelected = $('.colorPickerModal option[color=\'' + $scope.meta.colorSelected + '\']')[0].text;
+			if (colorTextSelected && typeof colorTextSelected === 'string') {
+				$('.colorPickerModal').selectpicker('val', colorTextSelected);
+			}
+		};
 		
 		modalSlotAdd.result.then(function (modalData) {
 			//modalData.slots[0].cmc		.name		.type
@@ -134,7 +173,7 @@ angular.module('WebFiles3App')
 	
 	$scope.colorButtonClicked = function(color) {
 		this.deselectOtherButtons(color);
-		$scope.displayData.meta.colorSelected = color;
+		$scope.meta.colorSelected = color;
 	};
 	
 	$scope.deselectOtherButtons = function(color) {
@@ -144,7 +183,7 @@ angular.module('WebFiles3App')
 	$scope.saveChanges = function() {
 		var dataToSave = [];
 		for (var i = 0; i < $scope.displayData.slots.length; i++) {
-			if ($scope.displayData.slots[i].cards && $scope.displayData.slots[i].cards[0] && $scope.displayData.slots[i].cards[0].color == $scope.displayData.meta.colorSelected) {
+			if ($scope.displayData.slots[i].cards && $scope.displayData.slots[i].cards[0] && $scope.displayData.slots[i].cards[0].color == $scope.meta.colorSelected) {
 				dataToSave.push($scope.displayData.slots[i]);
 			}
 		}

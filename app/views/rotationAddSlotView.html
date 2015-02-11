@@ -12,7 +12,7 @@
 		<tr ng-repeat="slot in data.slots">
 			<td style="min-width: 160px;">
 				<select class="colorPickerModal" ng-model="slot.color">
-					<option ng-repeat="color in data.colors">{{color.name}}</option>
+					<option ng-repeat="color in data.colors" color="{{color.ID}}">{{color.name}}</option>
 				</select>
 			</td>
 			<td style="min-width: 160px;">
