@@ -26,6 +26,10 @@ app.config(['$routeProvider',
 			templateUrl: '/views/basicCubeView.html',
 			controller: 'BasicCubeCtrl'
 		}).
+		when('/decks', {
+			templateUrl: '/views/decks/decksHome.html',
+			controller: 'DeckHomeCtrl'
+		}).
         /*when('/:id/edit', {
             templateUrl: '/views/editofficesupply.html',
             controller: 'EditOfficeSupply'
