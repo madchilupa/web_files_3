@@ -1,0 +1,24 @@
+<style type="text/css">
+div.deckList li {
+    list-style:none;
+    background-image:none;
+    background-repeat:none;
+    background-position:0; 
+}
+
+</style>
+
+<div class="deckList">
+	<ul>
+		<li ng-repeat="deck in displayData.decks">
+			{{deck.place}} - <a href="#/singleDeck/{{deck.deckID}}">{{deck.name}}</a> - <a href="#/singlePlayer/{{deck.playerID}}">{{deck.creditedTo}}</a>
+		</li>
+	</ul>
+</div>
+<div class="archetypeList">
+	<ul>
+		<li ng-repeat="archetype in displayData.archetypes">
+			{{archetype.name}} (<a href="#/multiDeck/{{archetype.archeTypeID}}">{{archetype.count}}</a>)
+		</li>
+	</ul>
+</div>
