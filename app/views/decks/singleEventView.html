@@ -10,11 +10,17 @@ div.deckList li {
 
 {{displayData.events[0].eventName}}
 <div class="deckList">
-	<ul>
-		<li ng-repeat="deck in displayData.decks">
-			{{deck.place}} - <a href="#/singleDeck/{{deck.deckID}}">{{deck.name}}</a> - <a href="#/singlePlayer/{{deck.playerID}}">{{deck.creditedTo}}</a>
-		</li>
-	</ul>
+	<table>
+		<tr>
+			<th>Place</th><th>Deck Name</th><th>Player</th><th>Archetype</th>
+		</tr>
+		<tr ng-repeat="deck in displayData.decks">
+			<td>{{deck.place}}</td>
+			<td style="padding-right:15px;"><a href="#/singleDeck/{{deck.deckID}}">{{deck.name}}</a></td>
+			<td style="padding-right:15px;"><a href="#/singlePlayer/{{deck.playerID}}">{{deck.creditedTo}}</a></td>
+			<td style="padding-right:15px;"><a href="#/singleDeckType/{{deck.deckTypeID}}">{{deck.deckTypeName}}</a></td>
+		</tr>
+	</table>
 </div>
 <div class="archetypeList">
 	<ul>

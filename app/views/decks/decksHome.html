@@ -24,6 +24,11 @@ div.eventList li {
 		</table>
 	</div>
 	<div class="rightPane" style="width:30%; float:left;">
-		formats
+		Archetypes
+		<table>
+			<tr ng-repeat="archetype in displayData.archetypes">
+				<td><a href="#/singleArchetype/{{archetype.ID}}">{{archetype.Name}}</a> (<a href="#/multiDeck/{{archetype.ID}}">{{archetype.numDecks}}</a>)</td>
+			</tr>
+		</table>
 	</div>
 </div>

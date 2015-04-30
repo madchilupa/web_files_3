@@ -10,8 +10,14 @@ module.exports = function(app) {
 	app.get('/allDecksInEvent');
 	
 	function gatherEvents(request, response) {
-		deckServer.reset();
-		deckServer.gatherListOfEvents(eventsGathered);
+		var formatID = request.query.formatID;
+		
+		if (!formatID) {
+			response.send(500, 'No format defined');
+		} else {
+			deckServer.reset();
+			deckServer.gatherListOfEvents(eventsGathered, formatID);
+		}
 		
 		function eventsGathered(serverResponse) {
 			if (serverResponse && serverResponse.dbError) {
@@ -25,8 +31,14 @@ module.exports = function(app) {
 	};
 	
 	function gatherArchetypesInFormats(request, response) {
-		deckServer.reset();
-		deckServer.gatherArchetypesInFormats(archetypesGathered);
+		var formatID = request.query.formatID;
+		
+		if (!formatID) {
+			response.send(500, 'No format defined');
+		} else {
+			deckServer.reset();
+			deckServer.gatherArchetypesInFormats(archetypesGathered, formatID);
+		}
 		
 		function archetypesGathered(serverResponse) {
 			if (serverResponse && serverResponse.dbError) {
@@ -34,7 +46,7 @@ module.exports = function(app) {
 			} else if (!serverResponse) {
 				resposne.send(500, 'No response from database');
 			} else {
-				response.send(200, {success: true, formatList: serverResponse.formats});
+				response.send(200, {success: true, archetypeList: serverResponse});
 			}
 		}
 	};

@@ -29,22 +29,4 @@ angular.module('WebFiles3App')
 		})
 		.error(function(data, status, headers, config) {
 		});
-/*
-	$scope.displayData.event = 
-	{eventID: 15, eventName: 'Grand Prix Memphis', city: 'Memphis', startDate: '2015-02-21', endDate: '2015-02-22'};
-
-	$scope.displayData.decks = [
-	{name: 'G/W Devotion',
-		creditedTo: 'Daniel Ceccheti',
-		eventName: 'Grand Prix Miami',
-		place: '1st',
-		deckID: 1
-	},
-	{name: 'Mono-Red Aggro',
-		creditedTo: 'Ryan Grodzinski',
-		eventName: 'Grand Prix Miami',
-		place: '5th-8th',
-		deckID: 2
-	}
-	];*/
 });

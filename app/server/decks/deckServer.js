@@ -84,6 +84,7 @@ deck.prototype.queryForDecks = function() {
 	var that = this, cmd =
 		'SELECT d.ID as deckID, d.Name as name, d.CreditedTo as creditedTo, die.Place as place, ' +
 		'	c.ID as cardID, c.Name as cardName, dc.QuantityMain as quantity, \'Main\' as location, c.ManaCost as manaCost, ' +
+		'	dt.Name as deckTypeName, dt.ID as deckTypeID, ' +
 		'	if EXISTS (SELECT 1 FROM dba.HasType ht JOIN dba.Type t on t.ID = ht.TypeID WHERE ht.CardID = c.ID and t.DisplayText = \'Creature\') then \'Creature\' ' +
 		'		else if EXISTS (SELECT 1 FROM dba.hasType ht join dba.Type t on t.ID = ht.TypeID WHERE ht.cardID = c.ID and t.DisplayText = \'Land\') then \'Land\' ' +
 		'		else if EXISTS (SELECT 1 FROM dba.hasType ht join dba.Type t on t.ID = ht.TypeID WHERE ht.cardID = c.ID and t.DisplayText = \'Artifact\') then \'Artifact\' ' +
@@ -95,13 +96,15 @@ deck.prototype.queryForDecks = function() {
 		'JOIN dba.Deck d on d.ID = die.DeckID ' +
 		'JOIN dba.DeckContents dc on dc.DeckID = d.ID ' +
 		'JOIN dba.Card c on c.ID = dc.CardID ' +
+		'LEFT OUTER JOIN dba.HasDeckType hdt on hdt.DeckID = d.ID and hdt.SystemGenerated = 1 ' +
+		'LEFT OUTER JOIN dba.DeckType dt on dt.ID = hdt.DeckTypeID ' +
 		'WHERE d.ActiveFlag = 1 and quantity > 0 AND ' + this.whereClause + ' ' +
 
 		'UNION ' +
 
 		'SELECT d.ID as deckID, d.Name as name, d.CreditedTo as creditedTo, die.Place as place, ' +
 		'	c.ID as cardID, c.Name as cardName, dc.Quantitysideboard as quantity, \'Sideboard\' as location, c.ManaCost as manaCost, ' +
-		'	\'Sideboard\' as cardType, ' +
+		'	dt.Name as deckTypeName, dt.ID as deckTypeID, \'Sideboard\' as cardType, ' +
 		'	if (SELECT count(*) FROM dba.HasColors hc WHERE hc.CardID = c.ID) > 1 then \'Multicolor\' ' +
 		'		else if EXISTS (SELECT 1 from dba.HasType ht JOIN dba.Type t on t.ID = ht.TypeID WHERE ht.CardID = c.ID and t.DisplayText = \'Land\') then \'Land\' ' +
 		'		else (SELECT FIRST co.DisplayText FROM dba.HasColors hc JOIN dba.Color co on co.ID = hc.ColorID WHERE hc.CardID = c.ID) endif endif as color ' +
@@ -109,6 +112,8 @@ deck.prototype.queryForDecks = function() {
 		'JOIN dba.Deck d on d.ID = die.DeckID ' +
 		'JOIN dba.DeckContents dc on dc.DeckID = d.ID ' +
 		'JOIN dba.Card c on c.ID = dc.CardID ' +
+		'LEFT OUTER JOIN dba.HasDeckType hdt on hdt.DeckID = d.ID and hdt.SystemGenerated = 1 ' +
+		'LEFT OUTER JOIN dba.DeckType dt on dt.ID = hdt.DeckTypeID ' +
 		'WHERE d.ActiveFlag = 1 and quantity > 0 AND ' + this.whereClause;
 	dbase.dbResults(cmd, function(databaseData) {
 		that.queryForDecksDataCallback(databaseData);
@@ -128,7 +133,9 @@ deck.prototype.queryForDecksDataCallback = function(databaseData) {
 					creditedTo: databaseData[i].creditedTo,
 					deckID: databaseData[i].deckID,
 					name: databaseData[i].name,
-					place: databaseData[i].place
+					place: databaseData[i].place,
+					deckTypeID: databaseData[i].deckTypeID,
+					deckTypeName: databaseData[i].deckTypeName
 				});
 				this.numDecks++;
 			}
@@ -192,6 +199,8 @@ var deckData = function(params) {
 	this.deckID = params.deckID ? params.deckID : null;
 	this.name = params.name ? params.name : null;
 	this.place = params.place ? params.place : null;
+	this.deckTypeID = params.deckTypeID ? params.deckTypeID : null;
+	this.deckTypeName = params.deckTypeName ? params.deckTypeName : null;
 	
 	this.cards = params.cards ? params.cards : [];
 };
@@ -209,9 +218,9 @@ var card = function(params) {
 };
 card.prototype = {};
 
-deckServer.prototype.gatherListOfEvents = function(callback) {
+deckServer.prototype.gatherListOfEvents = function(callback, formatID) {
 	var that = this, eventBuilder = new event();
-	eventBuilder.whereClause = '1=1';
+	eventBuilder.whereClause = 'Event.FormatID = ' + dbase.safeDBString(formatID);
 	eventBuilder.dataQueryCallback = dataCallback;
 	
 	eventBuilder.queryForEvents();
@@ -227,7 +236,16 @@ deckServer.prototype.gatherListOfEvents = function(callback) {
 	}
 };
 
-deckServer.prototype.gatherArchetypesInFormats = function(callback) {
+deckServer.prototype.gatherArchetypesInFormats = function(callback, formatID) {
+	var cmd = 
+		'SELECT dt.Name, dt.ID, count(isnull(hdt.DeckID, 0)) as numDecks ' +
+		'FROM DeckType dt ' +
+		'LEFT OUTER JOIN dba.HasDeckType hdt on hdt.DeckTypeID = dt.ID ' +
+		'WHERE dt.FormatID = \'' + dbase.safeDBString(formatID) + '\' and dt.ActiveFlag = 1 ' +
+		'GROUP BY dt.Name, dt.ID';
+	dbase.dbResults(cmd, function(databaseData) {
+		callback(databaseData);
+	});
 /*
 SELECT ft.Name, fi.AltName, hdt.*
 FROM dba.FormatInfo fi
@@ -307,12 +325,12 @@ function reset() {
 	serverObject = new deckServer();
 };
 
-function gatherListOfEvents(callback) {
-	return serverObject.gatherListOfEvents(callback);
+function gatherListOfEvents(callback, formatID) {
+	return serverObject.gatherListOfEvents(callback, formatID);
 };
 
-function gatherArchetypesInFormats(callback) {
-	return serverObject.gatherArchetypesInFormats(callback);
+function gatherArchetypesInFormats(callback, formatID) {
+	return serverObject.gatherArchetypesInFormats(callback, formatID);
 };
 
 function gatherSingleEventInfo(callback, eventID) {
