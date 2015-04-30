@@ -4,6 +4,7 @@ var deckServer = require('../decks/deckServer');
 
 module.exports = function(app) {
 	app.get('/eventList', gatherEvents);
+	app.get('/currArchetypesInFormats', gatherArchetypesInFormats);
 	app.get('/singleEventInfo', gatherSingleEventInfo);
 	app.get('/singleDeckInfo', gatherSingleDeckCards);
 	app.get('/allDecksInEvent');
@@ -19,6 +20,21 @@ module.exports = function(app) {
 				response.send(500, 'No response from database');
 			} else {
 				response.send(200, {success: true, eventList: serverResponse.events});
+			}
+		}
+	};
+	
+	function gatherArchetypesInFormats(request, response) {
+		deckServer.reset();
+		deckServer.gatherArchetypesInFormats(archetypesGathered);
+		
+		function archetypesGathered(serverResponse) {
+			if (serverResponse && serverResponse.dbError) {
+				response.send(500, serverResponse.errorMessage.toString());
+			} else if (!serverResponse) {
+				resposne.send(500, 'No response from database');
+			} else {
+				response.send(200, {success: true, formatList: serverResponse.formats});
 			}
 		}
 	};

@@ -15,7 +15,7 @@ angular.module('WebFiles3App')
 		{display: 'Data Management', route: 'data'},
 		{display: 'Cube Management', route: 'cube'},
 		{display: 'Rotation Cube Display', route: 'cubeBasic'},
-		{dipslay: 'Reports', route: 'report'},
+		{display: 'Reports', route: 'report'},
 		{display: 'Deck View', route: 'decks'}
     ];
   });

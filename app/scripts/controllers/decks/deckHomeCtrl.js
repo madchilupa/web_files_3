@@ -17,4 +17,10 @@ angular.module('WebFiles3App')
 		})
 		.error(function(data, status, headers, config) {
 		});
+	$http.get('/currArchetypesInFormats', {})
+		.success(function(data, status, heders, config) {
+			$scope.displayData.formats = data.formatList;
+		})
+		.error(function(data, status, headers, config) {
+		});
 });

@@ -7,10 +7,23 @@ div.eventList li {
 }
 </style>
 
-<div class="eventList">
-	<ul>
-		<li ng-repeat="event in displayData.events">
-			<a href="#/singleEvent/{{event.eventID}}">{{event.eventName}}</a>: {{event.startDate}} - {{event.endDate}} ({{event.city}}, {{event.country}})
-		</li>
-	</ul>
+<div class="outer">
+	<div class="leftPane" style="width:10%; float:left;">
+		ad
+	</div>
+	<div class="eventList" style="width:58%; float:left;">
+		<table>
+			<tr>
+				<th colspan="4" style="text-align:center;">Latest Events</th>
+			</tr>
+			<tr ng-repeat="event in displayData.events">
+				<td style="padding-right:15px;"><a href="#/singleEvent/{{event.eventID}}">{{event.eventName}}</a></td>
+				<td style="padding-right:15px;">{{event.startDate}} - {{event.endDate}}</td>
+				<td style="padding-right:15px;">{{event.city}}, {{event.country}}</td>
+			</tr>
+		</table>
+	</div>
+	<div class="rightPane" style="width:30%; float:left;">
+		formats
+	</div>
 </div>
