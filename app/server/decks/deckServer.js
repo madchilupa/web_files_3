@@ -13,6 +13,7 @@ var dataObj = function() {
 	
 	this.events = [];
 	this.decks = [];
+	this.deckTypes = [];
 };
 dataObj.prototype = {};
 
@@ -67,10 +68,152 @@ var eventData = function(params) {
 };
 eventData.prototype = {};
 
+var deckType = function() {
+	this.data = [];
+	
+	this.dataQueryCallback = function() {};
+	this.whereClause = '1=1';
+	
+	this.dbError = false;
+	this.errorMessage = null;
+	
+	this.numDeckTypes = 0;
+	this.templatesLoaded = 0;
+};
+deckType.prototype = {};
+
+deckType.prototype.queryForDeckType = function() {
+	var that = this, cmd = 
+		'SELECT dt.ID as deckTypeID, dt.Name as deckTypeName, dt.ParentID as deckTypeParentID, fi.ID as formatID, ' +
+		'fi.Name as formatName, fi.AltName as formatAltName, fi.SDate as formatStartDate, fi.FDate as formatFinishDate, ' +
+		'ft.ID as formatTypeID, ft.Name as formatTypeName, dt2.ID as subDeckTypeID, dt2.Name as subDeckTypeName ' +
+		'FROM dba.DeckType dt ' +
+		'JOIN dba.FormatInfo fi on fi.ID = dt.FormatID ' +
+		'JOIN dba.FormatType ft on ft.ID = fi.FormatType ' +
+		'LEFT OUTER JOIN dba.DeckType dt2 on dt2.ParentID = dt.ID ' +
+		'WHERE dt.ActiveFlag = \'1\' AND ' + this.whereClause;
+	dbase.dbResults(cmd, function(databaseData) {
+		that.queryForDeckTypeCallback(databaseData);
+	});
+};
+
+deckType.prototype.queryForDeckTypeCallback = function(databaseData) {
+	if (databaseData.dbError) {
+		this.dbError = true;
+		this.errorMessage = databaseData.errorMessage;
+	} else {
+		var deckTypesCreated = {};
+		for (var i = 0; i < databaseData.length; i++) {
+			var newFormatType = new formatTypeData({
+				formatTypeID: databaseData[i].formatTypeID,
+				formatTypeName: databaseData[i].formatTypeName
+			});
+			var newFormat = new formatData({
+				formatID: databaseData[i].formatID,
+				formatName: databaseData[i].formatName,
+				formatAltName: databaseData[i].formatAltName,
+				formatStartDate: databaseData[i].formatStartDate,
+				formatFinishDate: databaseData[i].formatFinishDate,
+				formatType: newFormatType
+			});
+			var newDeckType = new deckTypeData({
+				deckTypeName: databaseData[i].deckTypeName,
+				format: newFormat,
+				deckTypeID: databaseData[i].deckTypeID,
+				deckTypeParentID: databaseData[i].deckTypeParentID
+			});
+			if (databaseData[i].subDeckTypeID != null && databaseData[i].subDeckTypeID != '') {
+				newDeckType.subDeckTypes.push(new deckTypeData({
+					deckTypeName: databaseData[i].subDeckTypeName,
+					deckTypeID: databaseData[i].subDeckTypeID
+				}));
+			}
+			if (!deckTypesCreated[newDeckType.deckTypeID]) {
+				deckTypesCreated[newDeckType.deckTypeID] = newDeckType;
+			} else if (newDeckType.subDeckTypes.length > 0) {
+				deckTypesCreated[newDeckType.deckTypeID].subDeckTypes.push(newDeckType.subDeckTypes[0]);
+			}
+		}
+		for (var deckType in deckTypesCreated) {
+			if (deckTypesCreated.hasOwnProperty(deckType)) {
+				this.data.push(deckTypesCreated[deckType]);
+			}
+		}
+	}
+	this.dataQueryCallback();
+};
+
+deckType.prototype.queryForDeckTypeTemplate = function(deckTypeIndex) {
+	var that = this, cmd = 
+		'SELECT c.ID as cardID, c.Name as cardName, ' +
+		'if dttd.MustInclude = \'1\' then \'Must Include\' ' +
+		'else if dttd.MightInclude = \'1\' then \'Might Include\' ' +
+		'else if dttd.CannotInclude = \'1\' then \'Cannot Include\' ' +
+		'else \'\' endif endif endif as definitionType ' +
+		'FROM dba.DeckTypeTemplateDef_New dttd ' +
+		'JOIN dba.Card c on c.ID = dttd.CardID ' +
+		'WHERE ' + this.whereClause;
+	dbase.dbResults(cmd, function(databaseData) {
+		that.queryForDeckTypeTemplateCallback(databaseData, deckTypeIndex);
+	});
+};
+
+deckType.prototype.queryForDeckTypeTemplateCallback = function(databaseData, deckTypeIndex) {
+	var templates = [];
+	if (databaseData.dbError) {
+		this.dbError = true;
+		this.errorMessage = databaseData.errorMessage;
+	} else {
+		for (var i = 0; i < databaseData.length; i++) {
+			var newTemplate = new deckTypeTemplateData({
+				cardID: databaseData[i].cardID,
+				cardName: databaseData[i].cardName,
+				definitionType: databaseData[i].definitionType
+			});
+			templates.push(newTemplate);
+		}
+	}
+	this.dataQueryCallback(templates, deckTypeIndex);
+};
+
+var deckTypeData = function(params) {
+	this.deckTypeName = params.deckTypeName ? params.deckTypeName : null;
+	this.format = params.format ? params.format : null;
+	this.deckTypeID = params.deckTypeID ? params.deckTypeID : null;
+	this.deckTypeParentID = params.deckTypeParentID ? params.deckTypeParentID : null;
+	
+	this.subDeckTypes = [];
+	this.deckTemplates = [];
+};
+deckTypeData.prototype = {};
+
+var formatData = function(params) {
+	this.formatID = params.formatID ? params.formatID : null;
+	this.formatName = params.formatName ? params.formatName : null;
+	this.formatAltName = params.formatAltName ? params.formatAltName : null;
+	this.formatStartDate = params.formatStartDate ? params.formatStartDate : null;
+	this.formatFinishDate = params.formatFinishDate ? params.formatFinishDate : null;
+	this.formatType = params.formatType ? params.formatType : null;
+};
+formatData.prototype = {};
+
+var formatTypeData = function(params) {
+	this.formatTypeID = params.formatTypeID ? params.formatTypeID : null;
+	this.formatTypeName = params.formatTypeName ? params.formatTypeName : null;
+};
+formatTypeData.prototype = {};
+
+var deckTypeTemplateData = function(params) {
+	this.cardID = params.cardID ? params.cardID : null;
+	this.cardName = params.cardName ? params.cardName : null;
+	this.definitionType = params.definitionType ? params.definitionType : null;
+};
+deckTypeTemplateData.prototype = {};
+
 var deck = function() {
 	this.data = [];
 	this.numDecks = 0;
-	this.deckCardsloaded = 0;
+	this.deckCardsLoaded = 0;
 	
 	this.dataQueryCallback = function() {};
 	this.whereClause = '1=1';
@@ -321,6 +464,56 @@ deckServer.prototype.gatherSingleDeckCards = function(callback, deckID) {
 	}
 };
 
+deckServer.prototype.gatherSingleDeckTypeInfo = function(callback, deckTypeID) {
+	var that = this, deckTypeBuilder = new deckType();
+	
+	deckTypeBuilder.whereClause = 'dt.ID = ' + dbase.safeDBString(deckTypeID);
+	deckTypeBuilder.dataQueryCallback = gatherDeckTypeInformationFinished;
+	
+	deckTypeBuilder.queryForDeckType();
+	
+	function gatherDeckTypeInformationFinished() {
+		if (deckTypeBuilder.dbError) {
+			that.obj.dbError = true;
+			that.obj.errorMessage = deckTypeBuilder.errorMessage;
+			allGatheringFinished();
+		} else {
+			that.obj.deckTypes = deckTypeBuilder.data;
+			gatherDeckTemplateInformation();
+		}
+	}
+	
+	function gatherDeckTemplateInformation() {
+		deckTypeBuilder.numDeckTypes = that.obj.deckTypes.length;
+		deckTypeBuilder.dataQueryCallback = gatherDeckTemplateFinished;
+		for (var i = 0; i < that.obj.deckTypes.length; i++) {
+			deckTypeBuilder.whereClause = 'dttd.DeckTypeID = ' + dbase.safeDBString(that.obj.deckTypes[i].deckTypeID) + ' AND dttd.FormatID = ' +
+					dbase.safeDBString(that.obj.deckTypes[i].format.formatID);
+			deckTypeBuilder.queryForDeckTypeTemplate(i);
+		}
+	}
+	
+	function gatherDeckTemplateFinished(deckTypeTemplates, deckTypeIndex) {
+		if (deckTypeBuilder.dbError) {
+			that.obj.dbError = true;
+			that.obj.errorMessage = deckTypeBuilder.errorMessage;
+			allGatheringFinished();
+		} else {
+			deckTypeBuilder.templatesLoaded++;
+			if (that.obj.deckTypes[deckTypeIndex]) {
+				that.obj.deckTypes[deckTypeIndex].deckTemplates = deckTypeTemplates;
+			}
+			if (deckTypeBuilder.templatesLoaded >= deckTypeBuilder.numDeckTypes && !deckTypeBuilder.dbError) {
+				allGatheringFinished();
+			}
+		}
+	}
+	
+	function allGatheringFinished() {
+		callback(that.obj);
+	}
+};
+
 function reset() {
 	serverObject = new deckServer();
 };
@@ -341,9 +534,14 @@ function gatherSingleDeckCards(callback, deckID) {
 	return serverObject.gatherSingleDeckCards(callback, deckID);
 };
 
+function gatherSingleDeckTypeInfo(callback, deckTypeID) {
+	return serverObject.gatherSingleDeckTypeInfo(callback, deckTypeID);
+};
+
 var serverObject = new deckServer();
 module.exports.reset = reset;
 module.exports.gatherListOfEvents = gatherListOfEvents;
 module.exports.gatherArchetypesInFormats = gatherArchetypesInFormats;
 module.exports.gatherSingleEventInfo = gatherSingleEventInfo;
 module.exports.gatherSingleDeckCards = gatherSingleDeckCards;
+module.exports.gatherSingleDeckTypeInfo = gatherSingleDeckTypeInfo;

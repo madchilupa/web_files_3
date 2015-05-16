@@ -42,6 +42,10 @@ app.config(['$routeProvider',
 			templateUrl: '/views/decks/singleDeckView.html',
 			controller: 'SingleDeckView'
 		}).
+		when('/singleDeckType/:deckTypeID', {
+			templateUrl: '/views/decks/singleDeckTypeView.html',
+			controller: 'SingleDeckTypeView'
+		}).
 		when('/singleEvent/:eventID', {
 			templateUrl: '/views/decks/singleEventView.html',
 			controller: 'SingleEventView'

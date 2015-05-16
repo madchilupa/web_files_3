@@ -26,7 +26,7 @@ angular.module('WebFiles3App')
 			formatID: $scope.formatID
 		}})
 		.success(function(data, status, heders, config) {
-			$scope.displayData.archetypes = data.archetypeList;
+			$scope.displayData.deckTypes = data.deckTypeList;
 		})
 		.error(function(data, status, headers, config) {
 		});

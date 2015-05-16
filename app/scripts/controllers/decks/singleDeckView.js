@@ -12,25 +12,8 @@ angular.module('WebFiles3App')
 	$scope.thisEventID = $routeParams.eventID;
 	$scope.thisDeckID = $routeParams.deckID;
 	$scope.displayData = {};
-	
-	if ($scope.thisDeckID > 0) {
-		$http.get('/singleDeckInfo', {
-			params: {
-				deckID: $scope.thisDeckID
-			}})
-		.success(function(data, status, headers, config) {
-			$scope.displayData = data.serverData;
-			
-			$scope.displayData.viewTypeOptions = [
-				{code: 'Type', order: 2, title: 'Card Type'},
-				{code: 'Default', order: 1, title: 'Overview'},
-				{code: 'Cmc', order: 3, title: 'Converted Mana Cost'}
-			];
-			$scope.displayData.viewType = $scope.displayData.viewTypeOptions[0];
-		})
-		.error(function(data, status, headers, config) {
-		});
-	} else if ($scope.thisEventID > 0) {
+
+	if ($scope.thisEventID > 0) {
 		$http.get('/allDecksInEvent', {
 			params: {
 				eventID: $scope.thisEventID
@@ -39,5 +22,14 @@ angular.module('WebFiles3App')
 		})
 		.error(function(data, status, headers, config) {
 		});
+	}
+});
+
+angular.module('WebFiles3App')
+  .directive('deckDisplay', function() {
+	return {
+		restrict: 'E',
+		templateUrl: 'views/directives/deckDisplay.html',
+		controller: 'DeckDisplay'
 	}
 });

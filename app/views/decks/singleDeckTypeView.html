@@ -1,0 +1,23 @@
+<div style="text-align:center;">{{displayData.deckTypes[0].deckTypeName}}</div>
+<div style="text-align:center;">{{displayData.deckTypes[0].format.formatAltName}} ({{displayData.deckTypes[0].format.formatStartDate}} - {{displayData.deckTypes[0].format.formatFinishDate}})</div>
+<table ng-if="displayData.deckTypes[0].subDeckTypes.length > 1">
+	<tr>
+		<th style="text-align:center;">
+			Sub-Archetype Name
+		</th>
+	</tr>
+	<tr ng-repeat="subDeckType in displayData.deckTypes[0].subDeckTypes">
+		<td><a href="#/singleDeckType/{{subDeckType.deckTypeID}}">{{subDeckType.deckTypeName}}</a></td>
+	</tr>
+</table>
+Average Deck List
+<div ></div>
+
+<table ng-if="displayData.deckTypes[0].deckTemplates.length > 1">
+	<tr>
+		<th colspan="2" style="text-align:center;">Definition of {{displayData.deckTypes[0].deckTypeName}}</th>
+	</tr>
+	<tr ng-repeat="card in displayData.deckTypes[0].deckTemplates">
+		<td><a href="#/singleCard/{{card.cardID}}">{{card.cardName}}</a></td><td>{{card.definitionType}}</td>
+	</tr>
+</table>

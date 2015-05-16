@@ -97,3 +97,14 @@ table.rotationCubeTable td.emptyCell {
     border-bottom: 0;
   }
 }
+
+div.ui-menu li {
+    list-style:none;
+    background-image:none;
+    background-repeat:none;
+    background-position:0; 
+}
+
+div.deckHeader table tr tx {
+	border:black solid 1px;
+}
