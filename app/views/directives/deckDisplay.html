@@ -1,5 +1,5 @@
 
-<div class="ui-menu" ng-repeat="deck in displayData.decks">
+<div class="ui-menu" ng-repeat="deck in deckData.decks">
 	<div class="deckHeader" style="padding-left:20%;">
 		<table width="60%" style="border: black solid 1px;">
 			<tr>
@@ -15,8 +15,8 @@
 					<h5>{{deck.creditedTo}}</h5>
 				</td>
 				<td style="float:right; padding-right:5px;">
-					{{displayData.viewType.code}}
-					<select ng-options="item.title for item in displayData.viewTypeOptions" ng-model="displayData.viewType">
+					{{deckData.viewType.code}}
+					<select ng-options="item.title for item in deckData.viewTypeOptions" ng-model="deckData.viewType">
 					</select>
 				</td>
 			</tr>
@@ -28,35 +28,35 @@
 				<td style="vertical-align: top;">
 					<ul>
 						<!-- start OVERVIEW -->
-						<li ng-if="displayData.viewType.code == 'Overview'"><b>Creature</b></li>
-						<li ng-repeat="card in deck.cards" ng-if="card.cardType == 'Creature' && displayData.viewType.code == 'Overview'">
+						<li ng-if="deckData.viewType.code == 'Overview'"><b>Creature</b></li>
+						<li ng-repeat="card in deck.cards" ng-if="card.cardType == 'Creature' && deckData.viewType.code == 'Overview'">
 							{{card.quantity}} - {{card.cardName}}
 						</li>
-						<br ng-if="displayData.viewType.code == 'Overview'"/>
-						<li ng-if="displayData.viewType.code == 'Overview'"><b>Land</b></li>
-						<li ng-repeat="card in deck.cards" ng-if="card.cardType == 'Land' && displayData.viewType.code == 'Overview'">
+						<br ng-if="deckData.viewType.code == 'Overview'"/>
+						<li ng-if="deckData.viewType.code == 'Overview'"><b>Land</b></li>
+						<li ng-repeat="card in deck.cards" ng-if="card.cardType == 'Land' && deckData.viewType.code == 'Overview'">
 							{{card.quantity}} - {{card.cardName}}
 						</li>
 						<!-- end OVERVIEW -->
 						<!-- start TYPE -->
-						<li ng-if="displayData.viewType.code == 'Type' && deck.numCreatures > 0"><b>Creature</b></li>
-						<li ng-repeat="card in deck.cards" ng-if="card.cardType == 'Creature' && displayData.viewType.code == 'Type'">
+						<li ng-if="deckData.viewType.code == 'Type' && deck.numCreatures > 0"><b>Creature</b></li>
+						<li ng-repeat="card in deck.cards" ng-if="card.cardType == 'Creature' && deckData.viewType.code == 'Type'">
 							{{card.quantity}} - {{card.cardName}}
 						</li>
-						<br ng-if="displayData.viewType.code == 'Type' && deck.numPlaneswalkers > 0"/>
-						<li ng-if="displayData.viewType.code == 'Type' && deck.numPlaneswalkers > 0"><b>Planeswalker</b></li>
-						<li ng-repeat="card in deck.cards" ng-if="card.cardType == 'Planeswalker' && displayData.viewType.code == 'Type'">
+						<br ng-if="deckData.viewType.code == 'Type' && deck.numPlaneswalkers > 0"/>
+						<li ng-if="deckData.viewType.code == 'Type' && deck.numPlaneswalkers > 0"><b>Planeswalker</b></li>
+						<li ng-repeat="card in deck.cards" ng-if="card.cardType == 'Planeswalker' && deckData.viewType.code == 'Type'">
 							{{card.quantity}} - {{card.cardName}}
 						</li>
-						<br ng-if="displayData.viewType.code == 'Type' && deck.numLands > 0"/>
-						<li ng-if="displayData.viewType.code == 'Type' && deck.numLands > 0"><b>Land</b></li>
-						<li ng-repeat="card in deck.cards" ng-if="card.cardType == 'Land' && displayData.viewType.code == 'Type'">
+						<br ng-if="deckData.viewType.code == 'Type' && deck.numLands > 0"/>
+						<li ng-if="deckData.viewType.code == 'Type' && deck.numLands > 0"><b>Land</b></li>
+						<li ng-repeat="card in deck.cards" ng-if="card.cardType == 'Land' && deckData.viewType.code == 'Type'">
 							{{card.quantity}} - {{card.cardName}}
 						</li>
 						<!-- end TYPE -->
 						<!-- start CMC -->
-						<li ng-if="displayData.viewType.code == 'Cmc'"><b>1cc</b></li>
-						<li ng-repeat="card in deck.cards" ng-if="card.cardType == 'Creature' && card.cmc == '1' && displayData.viewType.code == 'Cmc'">
+						<li ng-if="deckData.viewType.code == 'Cmc'"><b>1cc</b></li>
+						<li ng-repeat="card in deck.cards" ng-if="card.cardType == 'Creature' && card.cmc == '1' && deckData.viewType.code == 'Cmc'">
 							{{card.quantity}} - {{card.cardName}}
 						</li>
 						<!-- end CMC -->
@@ -65,176 +65,176 @@
 				<td style="vertical-align: top;">
 					<ul>
 						<!-- start OVERVIEW -->
-						<li ng-if="displayData.viewType.code == 'Overview'"><b>Spell</b></li>
+						<li ng-if="deckData.viewType.code == 'Overview'"><b>Spell</b></li>
 						<li ng-repeat="card in deck.cards" ng-if="card.cardType != 'Creature' && card.cardType != 'Land'
-							&& card.cardType != 'Sideboard' && displayData.viewType.code == 'Overview'">
+							&& card.cardType != 'Sideboard' && deckData.viewType.code == 'Overview'">
 							{{card.quantity}} - {{card.cardName}}
 						</li>
-						<br ng-if="displayData.viewType.code == 'Overview'"/>
-						<li ng-if="displayData.viewType.code == 'Overview'"><b>Sideboard</b></li>
-						<li ng-repeat="card in deck.cards" ng-if="card.cardType == 'Sideboard' && displayData.viewType.code == 'Overview'">
+						<br ng-if="deckData.viewType.code == 'Overview'"/>
+						<li ng-if="deckData.viewType.code == 'Overview'"><b>Sideboard</b></li>
+						<li ng-repeat="card in deck.cards" ng-if="card.cardType == 'Sideboard' && deckData.viewType.code == 'Overview'">
 							{{card.quantity}} - {{card.cardName}}
 						</li>
 						<!-- end OVERVIEW -->
 						<!-- start TYPE -->
-						<li ng-if="displayData.viewType.code == 'Type' && deck.numSorceries > 0"><b>Sorcery</b></li>
-						<li ng-repeat="card in deck.cards" ng-if="card.cardType == 'Sorcery' && displayData.viewType.code == 'Type'">
+						<li ng-if="deckData.viewType.code == 'Type' && deck.numSorceries > 0"><b>Sorcery</b></li>
+						<li ng-repeat="card in deck.cards" ng-if="card.cardType == 'Sorcery' && deckData.viewType.code == 'Type'">
 							{{card.quantity}} - {{card.cardName}}
 						</li>
-						<br ng-if="displayData.viewType.code == 'Type' && deck.numInstants > 0"/>
-						<li ng-if="displayData.viewType.code == 'Type' && deck.numInstants > 0"><b>Instant</b></li>
-						<li ng-repeat="card in deck.cards" ng-if="card.cardType == 'Instant' && displayData.viewType.code == 'Type'">
+						<br ng-if="deckData.viewType.code == 'Type' && deck.numInstants > 0"/>
+						<li ng-if="deckData.viewType.code == 'Type' && deck.numInstants > 0"><b>Instant</b></li>
+						<li ng-repeat="card in deck.cards" ng-if="card.cardType == 'Instant' && deckData.viewType.code == 'Type'">
 							{{card.quantity}} - {{card.cardName}}
 						</li>
-						<br ng-if="displayData.viewType.code == 'Type' && deck.numArtifacts > 0"/>
-						<li ng-if="displayData.viewType.code == 'Type' && deck.numArtifacts > 0"><b>Artifact</b></li>
-						<li ng-repeat="card in deck.cards" ng-if="card.cardType == 'Artifact' && displayData.viewType.code == 'Type'">
+						<br ng-if="deckData.viewType.code == 'Type' && deck.numArtifacts > 0"/>
+						<li ng-if="deckData.viewType.code == 'Type' && deck.numArtifacts > 0"><b>Artifact</b></li>
+						<li ng-repeat="card in deck.cards" ng-if="card.cardType == 'Artifact' && deckData.viewType.code == 'Type'">
 							{{card.quantity}} - {{card.cardName}}
 						</li>
-						<br ng-if="displayData.viewType.code == 'Type' && deck.numEnchantments > 0"/>
-						<li ng-if="displayData.viewType.code == 'Type' && deck.numEnchantments > 0"><b>Enchantment</b></li>
-						<li ng-repeat="card in deck.cards" ng-if="card.cardType == 'Enchantment' && displayData.viewType.code == 'Type'">
+						<br ng-if="deckData.viewType.code == 'Type' && deck.numEnchantments > 0"/>
+						<li ng-if="deckData.viewType.code == 'Type' && deck.numEnchantments > 0"><b>Enchantment</b></li>
+						<li ng-repeat="card in deck.cards" ng-if="card.cardType == 'Enchantment' && deckData.viewType.code == 'Type'">
 							{{card.quantity}} - {{card.cardName}}
 						</li>
 						<!-- end TYPE -->
 						<!-- start CMC -->
-						<li ng-if="displayData.viewType.code == 'Cmc'"><b>2cc</b></li>
-						<li ng-repeat="card in deck.cards" ng-if="card.cardType == 'Creature' && card.cmc == '2' && displayData.viewType.code == 'Cmc'">
+						<li ng-if="deckData.viewType.code == 'Cmc'"><b>2cc</b></li>
+						<li ng-repeat="card in deck.cards" ng-if="card.cardType == 'Creature' && card.cmc == '2' && deckData.viewType.code == 'Cmc'">
 							{{card.quantity}} - {{card.cardName}}
 						</li>
 						<!-- end CMC -->
 					</ul>
 				</td>
-				<td style="vertical-align: top;" ng-if="displayData.viewType.code == 'Type' || displayData.viewType.code == 'Cmc'">
+				<td style="vertical-align: top;" ng-if="deckData.viewType.code == 'Type' || deckData.viewType.code == 'Cmc'">
 					<ul>
 						<!-- start TYPE -->
-						<li ng-if="displayData.viewType.code == 'Type'"><b>Sideboard</b></li>
-						<li ng-repeat="card in deck.cards" ng-if="card.cardType == 'Sideboard' && displayData.viewType.code == 'Type'">
+						<li ng-if="deckData.viewType.code == 'Type'"><b>Sideboard</b></li>
+						<li ng-repeat="card in deck.cards" ng-if="card.cardType == 'Sideboard' && deckData.viewType.code == 'Type'">
 							{{card.quantity}} - {{card.cardName}}
 						</li>
 						<!-- end TYPE -->
 						<!-- start CMC -->
-						<li ng-if="displayData.viewType.code == 'Cmc'"><b>3cc</b></li>
-						<li ng-repeat="card in deck.cards" ng-if="card.cardType == 'Creature' && card.cmc == '3' && displayData.viewType.code == 'Cmc'">
+						<li ng-if="deckData.viewType.code == 'Cmc'"><b>3cc</b></li>
+						<li ng-repeat="card in deck.cards" ng-if="card.cardType == 'Creature' && card.cmc == '3' && deckData.viewType.code == 'Cmc'">
 							{{card.quantity}} - {{card.cardName}}
 						</li>
 						<!-- end CMC -->
 					</ul>
 				</td>
-				<td style="vertical-align: top;" ng-if="displayData.viewType.code == 'Cmc'">
+				<td style="vertical-align: top;" ng-if="deckData.viewType.code == 'Cmc'">
 					<ul>
 						<!-- start CMC -->
-						<li ng-if="displayData.viewType.code == 'Cmc'"><b>4cc</b></li>
-						<li ng-repeat="card in deck.cards" ng-if="card.cardType == 'Creature' && card.cmc == '4' && displayData.viewType.code == 'Cmc'">
+						<li ng-if="deckData.viewType.code == 'Cmc'"><b>4cc</b></li>
+						<li ng-repeat="card in deck.cards" ng-if="card.cardType == 'Creature' && card.cmc == '4' && deckData.viewType.code == 'Cmc'">
 							{{card.quantity}} - {{card.cardName}}
 						</li>
 						<!-- end CMC -->
 					</ul>
 				</td>
-				<td style="vertical-align: top;" ng-if="displayData.viewType.code == 'Cmc'">
+				<td style="vertical-align: top;" ng-if="deckData.viewType.code == 'Cmc'">
 					<ul>
 						<!-- start CMC -->
-						<li ng-if="displayData.viewType.code == 'Cmc'"><b>5cc</b></li>
-						<li ng-repeat="card in deck.cards" ng-if="card.cardType == 'Creature' && card.cmc == '5' && displayData.viewType.code == 'Cmc'">
+						<li ng-if="deckData.viewType.code == 'Cmc'"><b>5cc</b></li>
+						<li ng-repeat="card in deck.cards" ng-if="card.cardType == 'Creature' && card.cmc == '5' && deckData.viewType.code == 'Cmc'">
 							{{card.quantity}} - {{card.cardName}}
 						</li>
 						<!-- end CMC -->
 					</ul>
 				</td>
-				<td style="vertical-align: top;" ng-if="displayData.viewType.code == 'Cmc'">
+				<td style="vertical-align: top;" ng-if="deckData.viewType.code == 'Cmc'">
 					<ul>
 						<!-- start CMC -->
-						<li ng-if="displayData.viewType.code == 'Cmc'"><b>6cc</b></li>
-						<li ng-repeat="card in deck.cards" ng-if="card.cardType == 'Creature' && card.cmc == '6' && displayData.viewType.code == 'Cmc'">
+						<li ng-if="deckData.viewType.code == 'Cmc'"><b>6cc</b></li>
+						<li ng-repeat="card in deck.cards" ng-if="card.cardType == 'Creature' && card.cmc == '6' && deckData.viewType.code == 'Cmc'">
 							{{card.quantity}} - {{card.cardName}}
 						</li>
 						<!-- end CMC -->
 					</ul>
 				</td>
-				<td style="vertical-align: top;" ng-if="displayData.viewType.code == 'Cmc'">
+				<td style="vertical-align: top;" ng-if="deckData.viewType.code == 'Cmc'">
 					<ul>
 						<!-- start CMC -->
-						<li ng-if="displayData.viewType.code == 'Cmc'"><b>> 6cc</b></li>
-						<li ng-repeat="card in deck.cards" ng-if="card.cardType == 'Creature' && card.cmc == 'X' && displayData.viewType.code == 'Cmc'">
+						<li ng-if="deckData.viewType.code == 'Cmc'"><b>> 6cc</b></li>
+						<li ng-repeat="card in deck.cards" ng-if="card.cardType == 'Creature' && card.cmc == 'X' && deckData.viewType.code == 'Cmc'">
 							{{card.quantity}} - {{card.cardName}}
 						</li>
 						<!-- end CMC -->
 					</ul>
 				</td>
 			</tr>
-			<tr ng-if="displayData.viewType.code == 'Cmc'">
-				<td style="vertical-align: top;" ng-if="displayData.viewType.code == 'Cmc'">
+			<tr ng-if="deckData.viewType.code == 'Cmc'">
+				<td style="vertical-align: top;" ng-if="deckData.viewType.code == 'Cmc'">
 					<ul>
 						<!-- start CMC -->
-						<li ng-if="displayData.viewType.code == 'Cmc'"><b>1cc</b></li>
+						<li ng-if="deckData.viewType.code == 'Cmc'"><b>1cc</b></li>
 						<li ng-repeat="card in deck.cards" ng-if="card.cardType != 'Creature' && card.cardType != 'Land' && card.cardType != 'Sideboard' &&
-							card.cmc == '1' && displayData.viewType.code == 'Cmc'">
+							card.cmc == '1' && deckData.viewType.code == 'Cmc'">
 							{{card.quantity}} - {{card.cardName}}
 						</li>
 						<!-- end CMC -->
 					</ul>
 				</td>
-				<td style="vertical-align: top;" ng-if="displayData.viewType.code == 'Cmc'">
+				<td style="vertical-align: top;" ng-if="deckData.viewType.code == 'Cmc'">
 					<ul>
 						<!-- start CMC -->
-						<li ng-if="displayData.viewType.code == 'Cmc'"><b>2cc</b></li>
+						<li ng-if="deckData.viewType.code == 'Cmc'"><b>2cc</b></li>
 						<li ng-repeat="card in deck.cards" ng-if="card.cardType != 'Creature' && card.cardType != 'Land' && card.cardType != 'Sideboard' &&
-							card.cmc == '2' && displayData.viewType.code == 'Cmc'">
+							card.cmc == '2' && deckData.viewType.code == 'Cmc'">
 							{{card.quantity}} - {{card.cardName}}
 						</li>
 						<!-- end CMC -->
 					</ul>
 				</td>
-				<td style="vertical-align: top;" ng-if="displayData.viewType.code == 'Cmc'">
+				<td style="vertical-align: top;" ng-if="deckData.viewType.code == 'Cmc'">
 					<ul>
 						<!-- start CMC -->
-						<li ng-if="displayData.viewType.code == 'Cmc'"><b>3cc</b></li>
+						<li ng-if="deckData.viewType.code == 'Cmc'"><b>3cc</b></li>
 						<li ng-repeat="card in deck.cards" ng-if="card.cardType != 'Creature' && card.cardType != 'Land' && card.cardType != 'Sideboard' &&
-							card.cmc == '3' && displayData.viewType.code == 'Cmc'">
+							card.cmc == '3' && deckData.viewType.code == 'Cmc'">
 							{{card.quantity}} - {{card.cardName}}
 						</li>
 						<!-- end CMC -->
 					</ul>
 				</td>
-				<td style="vertical-align: top;" ng-if="displayData.viewType.code == 'Cmc'">
+				<td style="vertical-align: top;" ng-if="deckData.viewType.code == 'Cmc'">
 					<ul>
 						<!-- start CMC -->
-						<li ng-if="displayData.viewType.code == 'Cmc'"><b>4cc</b></li>
+						<li ng-if="deckData.viewType.code == 'Cmc'"><b>4cc</b></li>
 						<li ng-repeat="card in deck.cards" ng-if="card.cardType != 'Creature' && card.cardType != 'Land' && card.cardType != 'Sideboard' &&
-							card.cmc == '4' && displayData.viewType.code == 'Cmc'">
+							card.cmc == '4' && deckData.viewType.code == 'Cmc'">
 							{{card.quantity}} - {{card.cardName}}
 						</li>
 						<!-- end CMC -->
 					</ul>
 				</td>
-				<td style="vertical-align: top;" ng-if="displayData.viewType.code == 'Cmc'">
+				<td style="vertical-align: top;" ng-if="deckData.viewType.code == 'Cmc'">
 					<ul>
 						<!-- start CMC -->
-						<li ng-if="displayData.viewType.code == 'Cmc'"><b>5cc</b></li>
+						<li ng-if="deckData.viewType.code == 'Cmc'"><b>5cc</b></li>
 						<li ng-repeat="card in deck.cards" ng-if="card.cardType != 'Creature' && card.cardType != 'Land' && card.cardType != 'Sideboard' &&
-							card.cmc == '5' && displayData.viewType.code == 'Cmc'">
+							card.cmc == '5' && deckData.viewType.code == 'Cmc'">
 							{{card.quantity}} - {{card.cardName}}
 						</li>
 						<!-- end CMC -->
 					</ul>
 				</td>
-				<td style="vertical-align: top;" ng-if="displayData.viewType.code == 'Cmc'">
+				<td style="vertical-align: top;" ng-if="deckData.viewType.code == 'Cmc'">
 					<ul>
 						<!-- start CMC -->
-						<li ng-if="displayData.viewType.code == 'Cmc'"><b>6cc</b></li>
+						<li ng-if="deckData.viewType.code == 'Cmc'"><b>6cc</b></li>
 						<li ng-repeat="card in deck.cards" ng-if="card.cardType != 'Creature' && card.cardType != 'Land' && card.cardType != 'Sideboard' &&
-							card.cmc == '6' && displayData.viewType.code == 'Cmc'">
+							card.cmc == '6' && deckData.viewType.code == 'Cmc'">
 							{{card.quantity}} - {{card.cardName}}
 						</li>
 						<!-- end CMC -->
 					</ul>
 				</td>
-				<td style="vertical-align: top;" ng-if="displayData.viewType.code == 'Cmc'">
+				<td style="vertical-align: top;" ng-if="deckData.viewType.code == 'Cmc'">
 					<ul>
 						<!-- start CMC -->
-						<li ng-if="displayData.viewType.code == 'Cmc'"><b>> 6cc</b></li>
+						<li ng-if="deckData.viewType.code == 'Cmc'"><b>> 6cc</b></li>
 						<li ng-repeat="card in deck.cards" ng-if="card.cardType != 'Creature' && card.cardType != 'Land' && card.cardType != 'Sideboard' &&
-							card.cmc == 'X' && displayData.viewType.code == 'Cmc'">
+							card.cmc == 'X' && deckData.viewType.code == 'Cmc'">
 							{{card.quantity}} - {{card.cardName}}
 						</li>
 						<!-- end CMC -->

@@ -24,12 +24,3 @@ angular.module('WebFiles3App')
 		});
 	}
 });
-
-angular.module('WebFiles3App')
-  .directive('deckDisplay', function() {
-	return {
-		restrict: 'E',
-		templateUrl: 'views/directives/deckDisplay.html',
-		controller: 'DeckDisplay'
-	}
-});

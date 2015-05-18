@@ -63,3 +63,19 @@ app.config(['$routeProvider',
         });
     }
 ]);
+
+angular.module('WebFiles3App')
+	.directive('deckDisplay', function() {
+		return {
+			restrict: 'E',
+			templateUrl: 'views/directives/deckDisplay.html',
+			controller: 'DeckDisplay'
+		}
+	})
+	.directive('gridDisplay', function() {
+		return {
+			restrict: 'E',
+			templateUrl: '/views/directives/gridDisplay.html',
+			controller: 'GridDisplay'
+		}
+	});
