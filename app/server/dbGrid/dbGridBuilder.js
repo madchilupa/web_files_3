@@ -9,6 +9,7 @@ var gridObject = function() {
 	this.columnInfo = [];
 	this.columnOrder = [];
 	this.tableInformation = {};
+	this.gridProperties = {};
 	
 	this.pagingSQL = null;
 	this.selectSQL = null;
@@ -279,6 +280,14 @@ function buildWhereStatement() {
 	currentGrid.whereSQL = ''
 }
 
+function saveGridProperties(databaseData, callback) {
+	currentGrid.gridProperties = {};
+	for (var i = 0; i < databaseData.length; i++) {
+		currentGrid.gridProperties[databaseData[i].ColumnName] = databaseData[i];
+	}
+	callback();
+}
+
 module.exports.resetGrid = function() {
 	currentGrid = new gridObject();
 };
@@ -336,6 +345,7 @@ module.exports.returnFinalData = function() {
 	returnData.gridName = currentGrid.gridName;
 	returnData.rows = currentGrid.rowData;
 	returnData.possibleChanges = false;
+	returnData.gridProperties = currentGrid.gridProperties;
 	return returnData;
 };
 
@@ -344,8 +354,9 @@ module.exports.buildPresentationData = function(callback) {
 		'FROM dba.GridColumnInformation ' + 
 		'WHERE GridName = \'' + dbase.safeDBString(currentGrid.gridName) + '\' ' + 
 		'ORDER BY ColumnOrder ASC';
-	
-	dbase.dbResults(cmd, callback);
+	dbase.dbResults(cmd, function(databaseData) {
+		saveGridProperties(databaseData, callback);
+	});
 };
 
 module.exports.saveGridData = function(postData) {
