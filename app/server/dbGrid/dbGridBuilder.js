@@ -94,8 +94,13 @@ gridObject.prototype.getTableInformation = function(callback) {
 		if (this.columnInfo.hasOwnProperty(columnName)) {
 			var columnDefinition = this.columnInfo[columnName];
 			
-			if (this.tableInformation[columnDefinition.tableName] == null) {
+			if (this.tableInformation[columnDefinition.tableName] == null && checkNotEmpty(columnDefinition.tableName)) {
 				this.tableInformation[columnDefinition.tableName] = new tableInformation();
+				totalTables++;
+			}
+			
+			if (this.tableInformation[columnDefinition.foreignTableName] == null && checkNotEmpty(columnDefinition.foreignTableName)) {
+				this.tableInformation[columnDefinition.foreignTableName] = new tableInformation();
 				totalTables++;
 			}
 		}
@@ -151,6 +156,7 @@ gridObject.prototype.assignTableAliasesToColumnInformation = function()
 
 gridObject.prototype.queryForData = function(pageNumber, callback) {
 	var cmd = this.buildDataSQL(pageNumber), newRow, newCell, column, that = this;
+
 	dbase.dbResults(cmd, function(databaseData) {
 		for (var i = 0; i < databaseData.length; i++) {
 			newRow = {};
@@ -166,7 +172,11 @@ gridObject.prototype.queryForData = function(pageNumber, callback) {
 				newCell.tableName = column.tableName;
 				newCell.valueDisplayed = databaseData[i][column.columnAlias];
 				newCell.origValue = databaseData[i][column.columnAlias];
-				newCell.columnType = column.columnType;
+				if (checkNotEmpty(column.foreignUniqueColType)) {
+					newCell.columnType = column.foreignUniqueColType;
+				} else {
+					newCell.columnType = column.columnType;
+				}
 				newCell.readOnly = column.readOnly;
 				newCell.changed = false;
 				newRow.columns.push(newCell);
@@ -197,8 +207,14 @@ gridObject.prototype.buildSelectStatement = function() {
 	for (var columnKey in this.columnInfo) {
 		if (this.columnInfo.hasOwnProperty(columnKey)) {
 			var column = this.columnInfo[columnKey];
-			this.selectSQL += ' ' + dbase.safeDBString(column.tableAlias) + '.' + dbase.safeDBString(column.columnName) + ' as ' +
-				dbase.safeDBString(column.columnAlias) + ',';
+			
+			if (checkNotEmpty(column.foreignTableName) && checkNotEmpty(column.foreignUniqueColumn)) {
+				this.selectSQL += ' ' + dbase.safeDBString(this.tableInformation[column.foreignTableName].tableAlias) + '.' + 
+					dbase.safeDBString(column.foreignUniqueColumn) + ' as ' + dbase.safeDBString(column.columnAlias) + ',';
+			} else {
+				this.selectSQL += ' ' + dbase.safeDBString(column.tableAlias) + '.' + dbase.safeDBString(column.columnName) + ' as ' +
+					dbase.safeDBString(column.columnAlias) + ',';
+			}
 		}
 	}
 	this.selectSQL = removeLastComma(this.selectSQL);
@@ -304,6 +320,8 @@ var gridColumnDefinition = function() {
 	
 	this.foreignTableName = null;
 	this.foreignColumnName = null;
+	this.foreignUniqueColType = null;
+	this.foreignUniqueColumn = null;
 	
 	this.readOnly = null;
 	this.columnVisible = null;
@@ -340,6 +358,12 @@ gridColumnDefinition.prototype.addProperty = function(memberName, value) {
 		case 'FOREIGNTABLENAME':
 			this.foreignTableName = value;
 			break;
+		case 'FOREIGNUNIQUECOLTYPE':
+			this.foreignUniqueColType = value;
+			break;
+		case 'FOREIGNUNIQUECOLUMN':
+			this.foreignUniqueColumn = value;
+			break;
 		case 'LENGTH':
 			this.columnSize = value;
 			break;
@@ -373,6 +397,14 @@ var cellData = function() {
 cellData.prototype = {};
 
 /**********************************************************/
+function checkNotEmpty(input) {
+	if (input == null || input == '') {
+		return false;
+	} else {
+		return true;
+	}
+}
+
 function removeLastComma(input) {
 	if (input.lastIndexOf(',') == input.length - 1) {
 		return input.slice(0, input.length - 2);

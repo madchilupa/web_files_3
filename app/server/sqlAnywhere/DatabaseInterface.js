@@ -24,6 +24,7 @@ module.exports.dbResults = function(cmdString, callback) {
 	conn.connect(config.conn_params, function() {
 		conn.exec(cmdString, function (error, result) {
 			if (error) {
+				console.log(cmdString);
 				throw error;
 				callback({dbError: true, errorMessage: error});
 			} else {
@@ -43,6 +44,7 @@ module.exports.executeCommand = function(cmdString, callback) {
 				throw error;
 				conn.rollback(function(err) {
 					if (err) {
+						console.log(cmdString);
 						throw err;
 					}
 					conn.disconnect();
@@ -51,6 +53,7 @@ module.exports.executeCommand = function(cmdString, callback) {
 			} else {
 				conn.commit(function(err) {
 					if (err) {
+						console.log(cmdString);
 						throw err;
 					} else {
 						callback(result);
