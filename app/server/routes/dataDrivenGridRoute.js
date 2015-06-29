@@ -8,6 +8,9 @@ module.exports = function(app) {
 	function gatherGridData(request, response) {
 		dbGrid.resetGrid();
 		dbGrid.setGridName(request.query.gridName);
+		if (request.query.gridProperties) {
+			dbGrid.setGridProperties(JSON.parse(request.query.gridProperties));
+		}
 		
 		dbGrid.findTableAndColumnInformation(constructPresentationData);
 		

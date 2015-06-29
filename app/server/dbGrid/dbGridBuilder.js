@@ -10,6 +10,8 @@ var gridObject = function() {
 	this.columnOrder = [];
 	this.tableInformation = {};
 	this.gridProperties = {};
+	this.gridColumnProperties = {};
+	this.gridFilters = [];
 	
 	this.pagingSQL = null;
 	this.selectSQL = null;
@@ -23,6 +25,10 @@ gridObject.prototype = {};
 
 gridObject.prototype.setGridName = function(newGridName) {
 	this.gridName = newGridName;
+};
+
+gridObject.prototype.setGridProperties = function(gridProperties) {
+	this.gridProperties = gridProperties;
 };
 
 gridObject.prototype.isValidGrid = function() {
@@ -197,8 +203,8 @@ gridObject.prototype.buildDataSQL = function(pageNumber) {
 };
 
 gridObject.prototype.buildPagingStatement = function(pageNumber) {
-	//this.pagingSQL = 'SELECT TOP 500 START AT ' + ((pageNumber - 1) * 10 + 1);
-	this.pagingSQL = 'SELECT TOP 5 START AT ' + ((pageNumber - 1) * 10 + 1);
+	this.pagingSQL = 'SELECT TOP 100 START AT ' + ((pageNumber - 1) * 10 + 1);
+	//this.pagingSQL = 'SELECT TOP 5 START AT ' + ((pageNumber - 1) * 10 + 1);
 };
 
 gridObject.prototype.buildSelectStatement = function() {
@@ -235,7 +241,16 @@ gridObject.prototype.buildFromStatement = function() {
 };
 
 gridObject.prototype.buildWhereStatement = function() {
-	this.whereSQL = ''
+	this.whereSQL = 'WHERE 1=1 ';
+	
+	for (var i = 0; i < this.gridFilters.length; i++) {
+		var filterName = this.gridFilters[i].filterName;
+		
+		if (this.gridProperties[filterName] != null) {
+			this.whereSQL += ' AND ' + this.tableInformation[this.gridFilters[i].tableName].tableAlias + '.' + this.gridFilters[i].columnName + ' = \'' +
+				dbase.safeDBString(this.gridProperties[filterName]) + '\' ';
+		}
+	}
 }
 
 gridObject.prototype.returnFinalData = function() {
@@ -243,7 +258,7 @@ gridObject.prototype.returnFinalData = function() {
 	returnData.gridName = this.gridName;
 	returnData.rows = this.rowData;
 	returnData.possibleChanges = false;
-	returnData.gridProperties = this.gridProperties;
+	returnData.gridColumnProperties = this.gridColumnProperties;
 	return returnData;
 };
 
@@ -253,17 +268,44 @@ gridObject.prototype.buildPresentationData = function(callback) {
 		'WHERE GridName = \'' + dbase.safeDBString(this.gridName) + '\' ' + 
 		'ORDER BY ColumnOrder ASC';
 	dbase.dbResults(cmd, function(databaseData) {
-		that.saveGridProperties(databaseData, callback);
+		that.saveGridColumnProperties(databaseData, callback);
 	});
 };
 
-gridObject.prototype.saveGridProperties = function(databaseData, callback) {
-	this.gridProperties = {};
+gridObject.prototype.saveGridColumnProperties = function(databaseData, callback) {
+	this.gridColumnProperties = {};
 	for (var i = 0; i < databaseData.length; i++) {
-		this.gridProperties[databaseData[i].ColumnName] = databaseData[i];
+		this.gridColumnProperties[databaseData[i].ColumnName] = databaseData[i];
+	}
+	this.buildGridFilters(callback);
+};
+
+gridObject.prototype.buildGridFilters = function(callback) {
+	var that = this, cmd = 
+		'SELECT gf.FilterName, gf.TableName, gf.ColumnName ' +
+		'FROM dba.GridFilter gf ' +
+		'JOIN dba.GridDefinition gd on gd.ID = gf.GridID ' +
+		'WHERE gd.GridName = \'' + this.gridName + '\';';
+	
+	dbase.dbResults(cmd, function(databaseData) {
+		that.saveGridFilters(databaseData, callback);
+	});
+};
+
+gridObject.prototype.saveGridFilters = function(databaseData, callback) {
+	for (var i = 0; i < databaseData.length; i++) {
+		var nextFilter = new filter();
+		
+		for (var columnName in databaseData[i]) {
+			if (databaseData[i].hasOwnProperty(columnName)) {
+				nextFilter.addProperty(columnName, databaseData[i][columnName]);
+			}
+		}
+		
+		this.gridFilters.push(nextFilter);
 	}
 	callback();
-}
+};
 
 gridObject.prototype.saveGridData = function(postData) {
 	//for each row, find which columns changed.
@@ -396,6 +438,27 @@ var cellData = function() {
 };
 cellData.prototype = {};
 
+var filter = function() {
+	this.filterName = null;
+	this.tableName = null;
+	this.columnName = null;
+};
+filter.prototype = {};
+
+filter.prototype.addProperty = function(memberName, value) {
+	switch (memberName.toUpperCase()) {
+		case 'COLUMNNAME':
+			this.columnName = value;
+			break;
+		case 'FILTERNAME':
+			this.filterName = value;
+			break;
+		case 'TABLENAME':
+			this.tableName = value;
+			break;
+	}
+};
+
 /**********************************************************/
 function checkNotEmpty(input) {
 	if (input == null || input == '') {
@@ -419,6 +482,10 @@ function resetGrid() {
 
 function setGridName(newGridName) {
 	serverObject.setGridName(newGridName);
+};
+
+function setGridProperties(gridProperties) {
+	serverObject.setGridProperties(gridProperties);
 };
 
 function isValidGrid() {
@@ -448,6 +515,7 @@ function saveGridData(postData) {
 var serverObject = new gridObject();
 module.exports.resetGrid = resetGrid;
 module.exports.setGridName = setGridName;
+module.exports.setGridProperties = setGridProperties;
 module.exports.isValidGrid = isValidGrid;
 module.exports.findTableAndColumnInformation = findTableAndColumnInformation;
 module.exports.queryForData = queryForData;

@@ -76,6 +76,10 @@ angular.module('WebFiles3App')
 		return {
 			restrict: 'E',
 			templateUrl: '/views/directives/gridDisplay.html',
-			controller: 'GridDisplay'
+			controller: 'GridDisplay',
+			scope: {
+				gridname: '=',
+				gridproperties: '='
+			}
 		}
 	});

@@ -8,7 +8,7 @@
 	<tr>
 		<th>#</th>
 		<th ng-repeat="col in dataDrivenGrid.rows[0].columns">
-			{{dataDrivenGrid.gridProperties[col.columnName].ColumnNameDisplayed}}
+			{{dataDrivenGrid.gridColumnProperties[col.columnName].ColumnNameDisplayed}}
 		</th>
 	</tr>
 	<tr ng-repeat="row in dataDrivenGrid.rows | orderBy:valueDisplayed" ng-blur="testRowBlur();">

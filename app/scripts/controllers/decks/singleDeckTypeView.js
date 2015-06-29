@@ -11,7 +11,9 @@ angular.module('WebFiles3App')
   .controller('SingleDeckTypeView', function ($scope, $routeParams, $http) {
 	$scope.thisDeckTypeID = $routeParams.deckTypeID;
 	$scope.displayData = {};
-	$scope.gridName = 'DeckTypeTemplate';
+	$scope.displayData.deckTypeGrid = {
+		deckTypeID: $routeParams.deckTypeID
+	};
 	
 	$http.get('/singleDeckTypeInfo', {
 		params: {
