@@ -514,6 +514,18 @@ deckServer.prototype.gatherSingleDeckTypeInfo = function(callback, deckTypeID) {
 	}
 };
 
+deckServer.prototype.getDecksDeckType = function(callback, deckID) {
+	var that = this, cmd =
+		'SELECT hdt.DeckTypeID, dt.Name ' +
+		'FROM dba.HasDeckType hdt ' +
+		'JOIN dba.DeckType dt on dt.ID = hdt.DeckTypeID ' +
+		'JOIN dba.Deck d on d.ID = hdt.DeckID ' +
+		'WHERE d.ID = \'' + dbase.safeDBString(deckID) + '\' AND hdt.SystemGenerated=\'1\';';
+	dbase.dbResults(cmd, function(databaseData) {
+		callback(databaseData);
+	});
+};
+
 function reset() {
 	serverObject = new deckServer();
 };
@@ -538,6 +550,10 @@ function gatherSingleDeckTypeInfo(callback, deckTypeID) {
 	return serverObject.gatherSingleDeckTypeInfo(callback, deckTypeID);
 };
 
+function getDecksDeckType(callback, deckID) {
+	return serverObject.getDecksDeckType(callback, deckID);
+};
+
 var serverObject = new deckServer();
 module.exports.reset = reset;
 module.exports.gatherListOfEvents = gatherListOfEvents;
@@ -545,3 +561,4 @@ module.exports.gatherArchetypesInFormats = gatherArchetypesInFormats;
 module.exports.gatherSingleEventInfo = gatherSingleEventInfo;
 module.exports.gatherSingleDeckCards = gatherSingleDeckCards;
 module.exports.gatherSingleDeckTypeInfo = gatherSingleDeckTypeInfo;
+module.exports.getDecksDeckType = getDecksDeckType;

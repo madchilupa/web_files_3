@@ -4,7 +4,13 @@
 		<button type="button" class="btn btn-default" ng-click="prepareToSaveGridChanges();"><span class="glyphicon glyphicon-floppy-disk"></span></button>
 	</div>
 </div>
+<!--{{dataDrivenGrid.gridSQL}}-->
 <table style="width:98%;">
+	<tr>
+		<th colspan="{{dataDrivenGrid.rows[0].columns.length + 1}}" style="text-align:center;">
+			{{dataDrivenGrid.gridNameDisplayed}}
+		</th>
+	</tr>
 	<tr>
 		<th>#</th>
 		<th ng-repeat="col in dataDrivenGrid.rows[0].columns">
@@ -25,6 +31,10 @@
 			<input type="text" name="{{col.tableName}}.{{col.columnName}}" id="{{row.rowID}}-{{col.tableName}}-{{col.columnName}}" ng-if="col.columnType == 'integer' && col.readOnly == false"
 				ng-model="col.valueDisplayed" ng-pattern="/^\d+$/" class="my-input" />
 			<input type="text" name="{{col.tableName}}.{{col.columnName}}" id="{{row.rowID}}-{{col.tableName}}-{{col.columnName}}" ng-if="col.columnType == 'integer' && col.readOnly == true"
+				ng-disabled="true" ng-model="col.valueDisplayed" ng-pattern="/^\d+$/" class="my-input" />
+			<input type="text" name="{{col.tableName}}.{{col.columnName}}" id="{{row.rowID}}-{{col.tableName}}-{{col.columnName}}" ng-if="col.columnType == 'double' && col.readOnly == false"
+				ng-model="col.valueDisplayed" ng-pattern="/^\d+$/" class="my-input" />
+			<input type="text" name="{{col.tableName}}.{{col.columnName}}" id="{{row.rowID}}-{{col.tableName}}-{{col.columnName}}" ng-if="col.columnType == 'double' && col.readOnly == true"
 				ng-disabled="true" ng-model="col.valueDisplayed" ng-pattern="/^\d+$/" class="my-input" />
 			<input type="checkbox" name="{{col.tableName}}.{{col.columnName}}" id="{{row.rowID}}-{{col.tableName}}-{{col.columnName}}" ng-if="col.columnType == 'bit' && col.readOnly == false"
 				ng-checked="col.valueDisplayed" />

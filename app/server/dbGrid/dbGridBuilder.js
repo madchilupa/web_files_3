@@ -5,6 +5,7 @@ var dbase = require('../sqlAnywhere/DatabaseInterface');
 var gridObject = function() {
 	this.gridName = null;
 	this.baseTableName = null;
+	this.gridNameDisplayed = null;
 	
 	this.columnInfo = [];
 	this.columnOrder = [];
@@ -37,6 +38,7 @@ gridObject.prototype.isValidGrid = function() {
 
 gridObject.prototype.findTableAndColumnInformation = function(callback) {
 	var that = this;
+	
 	this.findBaseTableName(function() {
 		that.findColumnDefinitions(function() {
 			that.getTableInformation(function() {
@@ -49,12 +51,13 @@ gridObject.prototype.findTableAndColumnInformation = function(callback) {
 };
 
 gridObject.prototype.findBaseTableName = function(callback) {
-	var that = this, cmd = 'SELECT BaseTable ' +
+	var that = this, cmd = 'SELECT BaseTable, GridNameDisplayed ' +
 		'FROM dba.GridDefinition ' +
 		'WHERE GridName = \'' + dbase.safeDBString(this.gridName) + '\';';
 	
 	dbase.dbResults(cmd, function(databaseData) {
 		that.baseTableName = databaseData[0].BaseTable;
+		that.gridNameDisplayed = databaseData[0].GridNameDisplayed;
 		
 		callback();
 	});
@@ -259,6 +262,8 @@ gridObject.prototype.returnFinalData = function() {
 	returnData.rows = this.rowData;
 	returnData.possibleChanges = false;
 	returnData.gridColumnProperties = this.gridColumnProperties;
+	returnData.gridNameDisplayed = this.gridNameDisplayed;
+	returnData.gridSQL = this.pagingSQL + ' ' + this.selectSQL + ' ' + this.fromSQL + ' ' + this.whereSQL;
 	return returnData;
 };
 
@@ -470,7 +475,7 @@ function checkNotEmpty(input) {
 
 function removeLastComma(input) {
 	if (input.lastIndexOf(',') == input.length - 1) {
-		return input.slice(0, input.length - 2);
+		return input.slice(0, input.length - 1);
 	} else {
 		return input;
 	}
@@ -522,3 +527,12 @@ module.exports.queryForData = queryForData;
 module.exports.returnFinalData = returnFinalData;
 module.exports.buildPresentationData = buildPresentationData;
 module.exports.saveGridData = saveGridData;
+
+function createServerObject () {
+	return new gridObject();
+}
+module.exports.createServerObject = createServerObject;
+module.exports.gridProperties = getGridProp;
+function getGridProp() {
+	return serverObject.gridProperties;
+}

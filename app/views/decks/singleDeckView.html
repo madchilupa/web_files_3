@@ -12,3 +12,10 @@ div.deckHeader table tr tx {
 
 </style>
 <deck-display></deck-display>
+
+<div ng-repeat="deckTypeIDIndex in displayData.deckTypeIDs">
+	{{deckTypeIDIndex.name}}
+	<grid-display gridName="'DeckTypeTemplate'" gridProperties="deckTypeIDIndex"></grid-display>
+</div>
+
+<grid-display gridName="'DeckTypeEvaluation'" gridProperties="displayData.deckTypeEval"></grid-display>

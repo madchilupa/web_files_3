@@ -9,6 +9,7 @@ module.exports = function(app) {
 	app.get('/singleDeckInfo', gatherSingleDeckCards);
 	app.get('/allDecksInEvent');
 	app.get('/singleDeckTypeInfo', gatherDeckTypeInfo);
+	app.get('/getDecksDeckType', getDecksDeckType);
 	
 	function gatherEvents(request, response) {
 		var formatID = request.query.formatID;
@@ -102,6 +103,27 @@ module.exports = function(app) {
 		} else {
 			deckServer.reset();
 			deckServer.gatherSingleDeckTypeInfo(deckTypeGathered, deckTypeID);
+		}
+		
+		function deckTypeGathered(serverResponse) {
+			if (serverResponse && serverResponse.dbError) {
+				response.send(500, serverResponse.errorMessage.toString());
+			} else if (!serverResponse) {
+				response.send(500, 'No response from database');
+			} else {
+				response.send(200, {success: true, serverData: serverResponse});
+			}
+		}
+	};
+	
+	function getDecksDeckType(request, response) {
+		var deckID = request.query.deckID;
+		
+		if (!deckID) {
+			response.send(500, 'No deck type to find');
+		} else {
+			deckServer.reset();
+			deckServer.getDecksDeckType(deckTypeGathered, deckID);
 		}
 		
 		function deckTypeGathered(serverResponse) {
