@@ -11,17 +11,22 @@ div.eventList li {
 	<div class="leftPane" style="width:10%; float:left;">
 		ad
 	</div>
-	<div class="eventList" style="width:58%; float:left;">
-		<table>
-			<tr>
-				<th colspan="4" style="text-align:center;">Latest Events</th>
-			</tr>
-			<tr ng-repeat="event in displayData.events">
-				<td style="padding-right:15px;"><a href="#/singleEvent/{{event.eventID}}">{{event.eventName}}</a></td>
-				<td style="padding-right:15px;">{{event.startDate}} - {{event.endDate}}</td>
-				<td style="padding-right:15px;">{{event.city}}, {{event.country}}</td>
-			</tr>
-		</table>
+	<div class="centerPane" style="width:58%; float:left;">
+		<div class="recentActivity">
+			Recent Activity
+		</div>
+		<div class="eventList">
+			<table>
+				<tr>
+					<th colspan="4" style="text-align:center;">Latest Events</th>
+				</tr>
+				<tr ng-repeat="event in displayData.events">
+					<td style="padding-right:15px;"><a href="#/singleEvent/{{event.eventID}}">{{event.eventName}}</a></td>
+					<td style="padding-right:15px;">{{event.startDate}} - {{event.endDate}}</td>
+					<td style="padding-right:15px;">{{event.city}}, {{event.country}}</td>
+				</tr>
+			</table>
+		</div>
 	</div>
 	<div class="rightPane" style="width:30%; float:left;">
 		Archetypes

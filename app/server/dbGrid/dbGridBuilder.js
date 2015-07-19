@@ -201,8 +201,9 @@ gridObject.prototype.buildDataSQL = function(pageNumber) {
 	this.buildSelectStatement();
 	this.buildFromStatement();
 	this.buildWhereStatement();
+	this.buildOrderByStatement();
 	
-	return this.pagingSQL + ' ' + this.selectSQL + ' ' + this.fromSQL + ' ' + this.whereSQL;
+	return this.pagingSQL + ' ' + this.selectSQL + ' ' + this.fromSQL + ' ' + this.whereSQL + ' ' + this.orderSQL;
 };
 
 gridObject.prototype.buildPagingStatement = function(pageNumber) {
@@ -256,6 +257,34 @@ gridObject.prototype.buildWhereStatement = function() {
 	}
 }
 
+gridObject.prototype.buildOrderByStatement = function() {
+	var gridHasSort = false;
+	this.orderSQL = 'ORDER BY ';
+	
+	for (var columnKey in this.columnInfo) {
+		if (this.columnInfo.hasOwnProperty(columnKey)) {
+			var column = this.columnInfo[columnKey];
+
+			if (checkNotEmpty(column.sortOrder)) {
+				gridHasSort = true;
+				this.orderSQL += ' ' + dbase.safeDBString(column.columnAlias);
+				
+				if (!checkNotEmpty(column.sortType) || column.sortType == 'A') {
+					this.orderSQL += ' ASC,';
+				} else {
+					this.orderSQL += ' DESC,';
+				}
+			}
+		}
+	}
+
+	if (!gridHasSort) {
+		this.orderSQL = '';
+	} else {
+		this.orderSQL = removeLastComma(this.orderSQL);
+	}
+}
+
 gridObject.prototype.returnFinalData = function() {
 	var returnData = {};
 	returnData.gridName = this.gridName;
@@ -263,7 +292,7 @@ gridObject.prototype.returnFinalData = function() {
 	returnData.possibleChanges = false;
 	returnData.gridColumnProperties = this.gridColumnProperties;
 	returnData.gridNameDisplayed = this.gridNameDisplayed;
-	returnData.gridSQL = this.pagingSQL + ' ' + this.selectSQL + ' ' + this.fromSQL + ' ' + this.whereSQL;
+	returnData.gridSQL = this.pagingSQL + ' ' + this.selectSQL + ' ' + this.fromSQL + ' ' + this.whereSQL + ' ' + this.orderSQL;
 	return returnData;
 };
 
@@ -364,6 +393,8 @@ var gridColumnDefinition = function() {
 	this.columnSize = null;
 	this.cellControlType = null;
 	this.columnType = null;
+	this.sortOrder = null;
+	this.sortType = null;
 	
 	this.foreignTableName = null;
 	this.foreignColumnName = null;
@@ -416,6 +447,12 @@ gridColumnDefinition.prototype.addProperty = function(memberName, value) {
 			break;
 		case 'READONLY':
 			this.readOnly = value;
+			break;
+		case 'SORTORDER':
+			this.sortOrder = value;
+			break;
+		case 'SORTTYPE':
+			this.sortType = value;
 			break;
 		case 'TABLENAME':
 			this.tableName = value;

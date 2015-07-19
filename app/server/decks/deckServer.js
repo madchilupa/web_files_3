@@ -385,7 +385,8 @@ deckServer.prototype.gatherArchetypesInFormats = function(callback, formatID) {
 		'FROM DeckType dt ' +
 		'LEFT OUTER JOIN dba.HasDeckType hdt on hdt.DeckTypeID = dt.ID ' +
 		'WHERE dt.FormatID = \'' + dbase.safeDBString(formatID) + '\' and dt.ActiveFlag = 1 ' +
-		'GROUP BY dt.Name, dt.ID';
+		'GROUP BY dt.Name, dt.ID ' +
+		'ORDER BY dt.Name;';
 	dbase.dbResults(cmd, function(databaseData) {
 		callback(databaseData);
 	});
