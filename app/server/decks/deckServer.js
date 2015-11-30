@@ -14,6 +14,7 @@ var dataObj = function() {
 	this.events = [];
 	this.decks = [];
 	this.deckTypes = [];
+	this.deckTypeCount = {};
 };
 dataObj.prototype = {};
 
@@ -432,12 +433,30 @@ deckServer.prototype.gatherSingleEventInfo = function(callback, eventID) {
 			allGatheringFinished();
 		} else {
 			that.obj.decks = deckBuilder.data;
+			that.gatherDeckTypes();
 			allGatheringFinished();
 		}
 	}
 	
 	function allGatheringFinished() {
 		callback(that.obj);
+	}
+};
+
+deckServer.prototype.gatherDeckTypes = function() {
+//this.obj.deckTypeCount
+	for (var deckIdx in this.obj.decks) {
+		if (this.obj.decks.hasOwnProperty(deckIdx)) {
+			var deck = this.obj.decks[deckIdx];
+			if (!this.obj.deckTypeCount[deck.deckTypeID]) {
+				this.obj.deckTypeCount[deck.deckTypeID] = {
+					deckTypeID: deck.deckTypeID,
+					deckTypeName: deck.deckTypeName,
+					count: 0
+				}
+			}
+			this.obj.deckTypeCount[deck.deckTypeID].count++;
+		}
 	}
 };
 
@@ -516,12 +535,26 @@ deckServer.prototype.gatherSingleDeckTypeInfo = function(callback, deckTypeID) {
 };
 
 deckServer.prototype.getDecksDeckType = function(callback, deckID) {
-	var that = this, cmd =
+	var cmd =
 		'SELECT hdt.DeckTypeID, dt.Name ' +
 		'FROM dba.HasDeckType hdt ' +
 		'JOIN dba.DeckType dt on dt.ID = hdt.DeckTypeID ' +
 		'JOIN dba.Deck d on d.ID = hdt.DeckID ' +
 		'WHERE d.ID = \'' + dbase.safeDBString(deckID) + '\' AND hdt.SystemGenerated=\'1\';';
+	dbase.dbResults(cmd, function(databaseData) {
+		callback(databaseData);
+	});
+};
+
+deckServer.prototype.getDecksWithDeckType = function(callback, deckTypeID) {
+	var cmd =
+		'SELECT d.ID ' +
+		'FROM dba.HasDeckType hdt ' +
+		'JOIN dba.Deck d on d.ID = hdt.DeckID ' +
+		'LEFT OUTER JOIN dba.DeckInEvent die on die.DeckID = d.ID ' +
+		'LEFT OUTER JOIN dba.Event e on e.ID = die.EventID ' +
+		'WHERE hdt.DeckTypeID = \'' + dbase.safeDBString(deckTypeID) + '\' ' +
+		'ORDER BY ifnull(e.EndDate , d.CreatedDate, current date) DESC, die.Place ASC;';
 	dbase.dbResults(cmd, function(databaseData) {
 		callback(databaseData);
 	});
@@ -555,6 +588,10 @@ function getDecksDeckType(callback, deckID) {
 	return serverObject.getDecksDeckType(callback, deckID);
 };
 
+function getDecksWithDeckType(callback, deckTypeID) {
+	return serverObject.getDecksWithDeckType(callback, deckTypeID);
+};
+
 var serverObject = new deckServer();
 module.exports.reset = reset;
 module.exports.gatherListOfEvents = gatherListOfEvents;
@@ -563,3 +600,4 @@ module.exports.gatherSingleEventInfo = gatherSingleEventInfo;
 module.exports.gatherSingleDeckCards = gatherSingleDeckCards;
 module.exports.gatherSingleDeckTypeInfo = gatherSingleDeckTypeInfo;
 module.exports.getDecksDeckType = getDecksDeckType;
+module.exports.getDecksWithDeckType = getDecksWithDeckType;

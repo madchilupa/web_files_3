@@ -9,7 +9,7 @@
  */
 angular.module('WebFiles3App')
   .controller('DeckDisplay', function ($scope, $routeParams, $http) {
-	$scope.deckIDToFind = $scope.thisDeckID;
+	$scope.deckIDToFind = $scope.deckid;
 	
 	if ($scope.deckIDToFind > 0) {
 		$http.get('/singleDeckInfo', {

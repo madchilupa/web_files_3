@@ -1,0 +1,47 @@
+<style type="text/css">
+
+</style>
+
+<div class="outer">
+	<div class="leftPane" style="width:10%; float:left;">
+		ad
+	</div>
+	<div class="centerPane" style="width:58%; float:left;">
+		<table>
+			<tr>
+				<td>
+					Enter list of cards to evaluate<br/>
+					
+					<textarea ng-model="displayData.inputText" rows="20" cols="50"></textarea>
+					<br/>
+					
+					<button type="button" class="btn btn-default" ng-click="evalList();">Evaluate</button>
+				</td>
+				<td>
+					Cards not found, correct then click Reevaluate
+					
+					<textarea ng-model="displayData.cardsNotFound" rows="20" cols="50"></textarea>
+					<br/>
+		
+					<button type="button" class="btn btn-default" ng-click="reevalList();">Reevaluate</button>
+				</td>
+			</tr>
+		</table>
+		<br/>
+		
+		<table>
+			<tr>
+				<th>Quantity</th>
+				<th>Card Name</th>
+				<th>Edition</th>
+			<tr ng-repeat="card in displayData.cardsFound">
+				<td>{{card.quantity}}</td>
+				<td>{{card.cardName}}</td>
+				<td>{{card.expansion}}</td>
+			</tr>
+		</table>
+	</div>
+	<div class="rightPane" style="width:30%; float:left;">
+
+	</div>
+</div>

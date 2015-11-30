@@ -3,8 +3,8 @@
 <div class="btn-toolbar" role="toolbar">
 	<div class="btn-group btn-group">
 		<button type="button" class="btn btn-default" ng-click="saveChanges();"><span class="glyphicon glyphicon-floppy-disk"></span></button>
-		<button type="button" class="btn btn-default" ng-click="openSlotModal();"><span class="glyphicon glyphicon-plus"></span></button>
-		<button type="button" class="btn btn-default" ng-click="openDeleteModal();"><span class="glyphicon glyphicon-minus"></span></button>
+		<button type="button" class="btn btn-default" ng-click="addSlotModal();"><span class="glyphicon glyphicon-plus"></span></button>
+		<button type="button" class="btn btn-default" ng-click="deleteSlotModal();"><span class="glyphicon glyphicon-minus"></span></button>
 	</div>
 	<div class="btn-group" data-toggle="buttons" id="buttonsColorSwitching">
 		<label class="btn btn-default" ng-class="{'active': $index == 0}" color="{{color.ID}}" ng-repeat="color in meta.colorArray" ng-click="colorButtonClicked(color.ID)">
@@ -25,6 +25,7 @@
 				<span class="glyphicon glyphicon-align-justify"></span>
 				
 			</span>
+			<button type="button" class="btn btn-default" style="float:left;" ng-click="addCardToSlotModal();"><span class="glyphicon glyphicon-plus"></span></button>
 			<span class="btn" style="float:left;"  data-drop="true" data-jqyoui-options="{accept: '.btn-draggable-slot'}" jqyoui-droppable="{onDrop: 'stopSlotDrag({{$index}})'}">
 				Move Slot Here
 			</span>

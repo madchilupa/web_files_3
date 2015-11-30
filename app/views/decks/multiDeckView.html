@@ -1,0 +1,17 @@
+<style type="text/css">
+div.ui-menu li {
+    list-style:none;
+    background-image:none;
+    background-repeat:none;
+    background-position:0; 
+}
+
+div.deckHeader table tr tx {
+	border:black solid 1px;
+}
+
+</style>
+
+<div ng-repeat="deckID in displayData.deckIDs" style="margin-bottom:10px;">
+	<deck-display deckID="deckID.ID" deckProperties="displayData.deckProperties"></deck-display>
+</div>

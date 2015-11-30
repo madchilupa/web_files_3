@@ -12,9 +12,12 @@ angular.module('WebFiles3App')
 	// $scope.thisEventID = $routeParams.eventID;
 	$scope.thisDeckID = $routeParams.deckID;
 	$scope.displayData = {};
-	$scope.displayData.deckTypeIDs = [];
 	
-	$scope.displayData.deckTypeEval = {
+	$scope.displayData.deckProperties = {
+		linkToSingleDeck: false
+	};
+	
+	$scope.displayData.deckTypeEvalGridProps = {
 		deckID: $scope.thisDeckID
 	};
 	
@@ -32,15 +35,4 @@ angular.module('WebFiles3App')
 	})
 	.error(function(data, status, headers, config) {
 	});
-
-	// if ($scope.thisEventID > 0) {
-		// $http.get('/allDecksInEvent', {
-			// params: {
-				// eventID: $scope.thisEventID
-			// }})
-		// .success(function(data, status, headers, config) {
-		// })
-		// .error(function(data, status, headers, config) {
-		// });
-	// }
 });

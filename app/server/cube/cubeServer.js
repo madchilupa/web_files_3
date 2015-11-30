@@ -70,6 +70,7 @@ cubeServer.prototype.cardsInEachSlot = function(callback) {
 		'set @date = current date; ' +
 		'set @cubeID = 11; ' +
 
+		'/* Current cards in slots */ ' +
         'INSERT INTO slotContents (cardName, cardID, slotGeneratedName, slotID, slotSequence, SlotColorID, slotName, color) ' +
         'WITH cardsInCube as ( ' +
 		'SELECT c.Name, c.id as cardID, ' +
@@ -78,7 +79,7 @@ cubeServer.prototype.cardsInEachSlot = function(callback) {
 		'	(SELECT isnull(sum(Quantity), 0) FROM dba.CubeContents WHERE CubeID = @cubeID and CardID = c.ID and AddDel = \'D\' and  ' +
 		'		ChangeDate <= @date and isnull(SlotID, 0) = isnull(cc.SlotID, 0)) as total, ' +
 		'	cs.GeneratedName, cs.ID as SlotID, isnull(cs.Sequence, 99999) as SlotSequence, cs.ColorID as SlotColorID, ' +
-		'	(SELECT FIRST DisplayName FROM dba.CubeSlotName WHERE isnull(CubeSlotID, 0) = isnull(cc.SlotID, 0) and DateChanged <= @date ORDER BY DateChanged) as SlotName, ' +
+		'	(SELECT FIRST DisplayName FROM dba.CubeSlotName WHERE isnull(CubeSlotID, 0) = isnull(cc.SlotID, 0) and DateChanged <= @date ORDER BY DateChanged DESC) as SlotName, ' +
 		'	if (SELECT count(*) from dba.CubeCardHasColorTranslation cchct WHERE cchct.CardID = c.ID and cchct.CubeID = @cubeID) > 1 then \'Multicolor\' ' +
 		'	else if EXISTS(SELECT 1 FROM dba.CubeCardHasColorTranslation cchct WHERE cchct.CardID = c.ID and cchct.CubeID = @cubeID) ' +
 		'		 then (SELECT FIRST co.DisplayText FROM dba.CubeCardHasColorTranslation cchct JOIN dba.Color co ON co.ID = cchct.ColorID ' +
@@ -93,13 +94,15 @@ cubeServer.prototype.cardsInEachSlot = function(callback) {
         'SELECT Name, cardID, GeneratedName, SlotID, SlotSequence, SlotColorID, SlotName, color ' +
         'FROM cardsInCube; ' +
 
+		'/* Current slots without cards */ ' +
         'INSERT INTO slotContents (cardName, cardID, slotGeneratedName, slotID, slotSequence, SlotColorID, slotName, color) ' +
         'SELECT null, null, cs.GeneratedName, cs.ID, isnull(cs.Sequence, 99999), cs.ColorID, ' +
         '    (SELECT FIRST DisplayName FROM dba.CubeSlotName WHERE isnull(CubeSlotID, 0) = isnull(cs.ID, 0) and DateChanged <= @date ORDER BY DateChanged), ' +
         '    null ' +
         'FROM dba.CubeSlot cs ' +
-        'WHERE cs.CubeID = @cubeID and cs.ID not in (SELECT DISTINCT slotID FROM slotContents); ' +
+        'WHERE cs.CubeID = @cubeID and cs.ID not in (SELECT DISTINCT slotID FROM slotContents) and cs.DateAdded >= @date and cs.DateRemoved <= @date; ' +
 
+		'/* Current cards not in a slot */ ' +
         'INSERT INTO slotContents (cardName, cardID, slotGeneratedName, slotID, slotSequence, SlotColorID, slotName, color) ' +
         'WITH cardsWithoutSlot as ( ' +
         'SELECT c.Name, c.ID as cardID, null as GeneratedName, null as SlotID, null as SlotSequence, null as SlotColorID, null as slotName, null as color, ' +

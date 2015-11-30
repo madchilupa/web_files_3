@@ -4,7 +4,8 @@
 		<table width="60%" style="border: black solid 1px;">
 			<tr>
 				<td style="padding-left:5px;">
-					<h3>{{deck.name}}</h3>
+					<h3 ng-if="deckproperties.linkToSingleDeck == true"><a href="#/singleDeck/{{deck.deckID}}">{{deck.name}}</a></h3>
+					<h3 ng-if="deckproperties.linkToSingleDeck == false">{{deck.name}}</h3>
 				</td>
 				<td style="float:right; padding-right:5px;">
 					<h5>{{deck.eventName}} - {{deck.place}} - {{deck.date}}</h5>

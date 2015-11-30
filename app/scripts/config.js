@@ -23,14 +23,18 @@ app.config(['$routeProvider',
 			controller: 'BasicCubeCtrl'
 		}).
 		when('/data', {
-            templateUrl: '/views/datadrivenGridView.html',
-            controller: 'DatadrivenCtrl'
+            templateUrl: '/views/dataMgmt/dataManagementView.html',
+            controller: 'DataManagementCtrl'
         }).
 		when('/decks', {
 			templateUrl: '/views/decks/decksHome.html',
 			controller: 'DeckHomeCtrl'
 		}).
-		when('/multiDeck/:archetypeID', {
+		when('/lists', {
+			templateUrl: '/views/lists/listsHome.html',
+			controller: 'ListHomeCtrl'
+		}).
+		when('/multiDeck/:deckTypeID', {
 			templateUrl: '/views/decks/multiDeckView.html',
 			controller: 'MultiDeckView'
 		}).
@@ -69,7 +73,11 @@ angular.module('WebFiles3App')
 		return {
 			restrict: 'E',
 			templateUrl: 'views/directives/deckDisplay.html',
-			controller: 'DeckDisplay'
+			controller: 'DeckDisplay',
+			scope: {
+				deckid: '=',
+				deckproperties: '='
+			}
 		}
 	})
 	.directive('gridDisplay', function() {

@@ -1,6 +1,7 @@
 <input type="hidden" ng-model="dataDrivenGrid.possibleChanges" />
 <div class="btn-toolbar" role="toolbar">
 	<div class="btn-group btn-group-lg">
+		<button type="button" class="btn btn-default" ng-click="addRowToGrid();"><span class="glyphicon glyphicon-plus"></span></button>
 		<button type="button" class="btn btn-default" ng-click="prepareToSaveGridChanges();"><span class="glyphicon glyphicon-floppy-disk"></span></button>
 	</div>
 </div>
@@ -21,25 +22,25 @@
 		<td>{{row.rowID}}</td>
 		<td ng-repeat="col in row.columns">
 			<input type="text" name="{{col.tableName}}.{{col.columnName}}" id="{{row.rowID}}-{{col.tableName}}-{{col.columnName}}" ng-if="col.columnType == 'varchar' && col.readOnly == false" 
-				ng-model="col.valueDisplayed" orig-value="{{col.valueDisplayed}}" ng-blur="textBoxChange($event, row, col);"/>
+				ng-model="col.valueDisplayed" orig-value="{{col.valueDisplayed}}" ng-blur="textBoxChange($event, row, col);" />
 			<input type="text" name="{{col.tableName}}.{{col.columnName}}" id="{{row.rowID}}-{{col.tableName}}-{{col.columnName}}" ng-if="col.columnType == 'varchar' && col.readOnly == true"
 				ng-disabled="true" ng-model="col.valueDisplayed" />
 			<input type="text" name="{{col.tableName}}.{{col.columnName}}" id="{{row.rowID}}-{{col.tableName}}-{{col.columnName}}" ng-if="col.columnType == 'date' && col.readOnly == false"
-				ng-model="col.valueDisplayed" orig-value="{{col.valueDisplayed}}" ng-blur="textBoxChange($event, row, col);"/>
+				ng-model="col.valueDisplayed" orig-value="{{col.valueDisplayed}}" ng-blur="textBoxChange($event, row, col);" />
 			<input type="text" name="{{col.tableName}}.{{col.columnName}}" id="{{row.rowID}}-{{col.tableName}}-{{col.columnName}}" ng-if="col.columnType == 'date' && col.readOnly == true"
 				ng-disabled="true" ng-model="col.valueDisplayed" />
 			<input type="text" name="{{col.tableName}}.{{col.columnName}}" id="{{row.rowID}}-{{col.tableName}}-{{col.columnName}}" ng-if="col.columnType == 'integer' && col.readOnly == false"
-				ng-model="col.valueDisplayed" ng-pattern="/^\d+$/" class="my-input" />
+				ng-model="col.valueDisplayed" ng-pattern="/^\d+$/" class="my-input" orig-value="{{col.valueDisplayed}}" ng-blur="textBoxChange($event, row, col);" />
 			<input type="text" name="{{col.tableName}}.{{col.columnName}}" id="{{row.rowID}}-{{col.tableName}}-{{col.columnName}}" ng-if="col.columnType == 'integer' && col.readOnly == true"
 				ng-disabled="true" ng-model="col.valueDisplayed" ng-pattern="/^\d+$/" class="my-input" />
 			<input type="text" name="{{col.tableName}}.{{col.columnName}}" id="{{row.rowID}}-{{col.tableName}}-{{col.columnName}}" ng-if="col.columnType == 'double' && col.readOnly == false"
-				ng-model="col.valueDisplayed" ng-pattern="/^\d+$/" class="my-input" />
+				ng-model="col.valueDisplayed" ng-pattern="/^\d+$/" class="my-input" orig-value="{{col.valueDisplayed}}" ng-blur="textBoxChange($event, row, col);" />
 			<input type="text" name="{{col.tableName}}.{{col.columnName}}" id="{{row.rowID}}-{{col.tableName}}-{{col.columnName}}" ng-if="col.columnType == 'double' && col.readOnly == true"
 				ng-disabled="true" ng-model="col.valueDisplayed" ng-pattern="/^\d+$/" class="my-input" />
 			<input type="checkbox" name="{{col.tableName}}.{{col.columnName}}" id="{{row.rowID}}-{{col.tableName}}-{{col.columnName}}" ng-if="col.columnType == 'bit' && col.readOnly == false"
-				ng-checked="col.valueDisplayed" />
+				ng-model="col.valueDisplayed" ng-checked="col.valueDisplayed" orig-value="{{col.valueDisplayed}}" ng-change="checkBoxChange($event, row, col);" />
 			<input type="checkbox" name="{{col.tableName}}.{{col.columnName}}" id="{{row.rowID}}-{{col.tableName}}-{{col.columnName}}" ng-if="col.columnType == 'bit' && col.readOnly == true"
-				ng-disabled="true" ng-checked="col.valueDisplayed" />
+				ng-model="col.valueDisplayed" ng-disabled="true" ng-checked="col.valueDisplayed" />
 			<input type="text" name="{{col.tableName}}.{{col.columnName}}" id="{{row.rowID}}-{{col.tableName}}-{{col.columnName}}" ng-if="col.columnType == 'increment'"
 				ng-pattern="/^\d+$/" class="my-input my-input-increment" ng-model="col.change" ng-blur="increment(row, col, 1);" />
 			<input type="text" name="{{col.tableName}}.{{col.columnName}}" id="{{row.rowID}}-{{col.tableName}}-{{col.columnName}}" ng-if="col.columnType == 'decrement'" 

@@ -9,6 +9,9 @@
  */
 angular.module('WebFiles3App')
   .controller('BasicCubeCtrl', function ($scope, $http) {
+	$scope.displayData = {};
+	$scope.displayData.meta = {};
+	
 	$http.get('/cubeList', {})
 		.success(function(data, status, headers, config) {
 			$scope.cubeList = {};

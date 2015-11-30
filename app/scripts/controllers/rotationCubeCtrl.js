@@ -53,7 +53,7 @@ angular.module('WebFiles3App')
 		});
 	
 	/** Modal for deleting a slot **/
-	$scope.openDeleteModal = function() {
+	$scope.deleteSlotModal = function() {
 		var dataToSend = {
 			meta: {
 				colors: $scope.meta.colorDefinition
@@ -81,7 +81,7 @@ angular.module('WebFiles3App')
 	};
 	
 	/** Modal for adding a slot **/
-	$scope.openSlotModal = function () {
+	$scope.addSlotModal = function () {
 		var dataToSend = {
 			colors: $scope.meta.colorArray,
 			colorSelected: $scope.meta.colorSelected,
@@ -159,6 +159,34 @@ angular.module('WebFiles3App')
 					});
 			}
 		}, function() {
+			//Modal dismissed
+		});
+	};
+	
+	/** Modal for deleting a slot **/
+	$scope.addCardToSlotModal = function() {
+		var dataToSend = {
+			meta: {
+				colors: $scope.meta.colorDefinition
+			}
+		};
+		
+		var modalSlotDelete = $modal.open({
+			templateUrl: 'views/rotationDeleteSlotView.html',
+			controller: 'RotationDeleteSlotCtrl',
+			size: 'lg',
+			resolve: {
+				data: function() {
+					return dataToSend;
+				}
+			}
+		});
+		
+		modalSlotDelete.opened.then(function() {
+		});
+		
+		modalSlotDelete.result.then(function (modalData) {
+		}, function () {
 			//Modal dismissed
 		});
 	};

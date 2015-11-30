@@ -349,20 +349,24 @@ gridObject.prototype.saveGridData = function(postData) {
 		
 	//Final SQL should look like:
 	//	UPDATE dba.TableName SET ColumnName1 = Value1, ColumnName2 = Value2 WHERE PKColumn = PKValue;
-	for (var row in postData) {
-		if (postData.hasOwnProperty(row)) {
-			var sql = '';
+	
+	for (var rowIdx in postData) {
+		if (postData.hasOwnProperty(rowIdx)) {
+			var sql = 'UPDATE dba.' + this.baseTableName, row = postData[rowIdx];
+			
 			sql += ' SET';
-			for (var col in row.columns) {
-				if (row.columns.hasOwnProperty(col)) {
+			for (var colIdx in row.columns) {
+				if (row.columns.hasOwnProperty(colIdx)) {
+					var col = row.columns[colIdx];
+
 					if (col.changed == true) {
-						sql += ' ' + dbase.safeDBString(col.columnName) + ' = ' + dbase.safeDBString(col.valueDisplayed) + ',';
+						sql += ' ' + dbase.safeDBString(col.columnName) + ' = \'' + dbase.safeDBString(col.valueDisplayed) + '\',';
 					}
 				}
 			}
 			sql = removeLastComma(sql);
 			
-			sql += ' WHERE ';
+			sql += ' WHERE ' + this.tableInformation[this.baseTableName].uniqueColumnName + ' = \'' + dbase.safeDBString(row.rowID) + '\';';
 		}
 	}
 };

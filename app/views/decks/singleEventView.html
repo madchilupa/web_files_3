@@ -24,8 +24,8 @@ div.deckList li {
 </div>
 <div class="archetypeList">
 	<ul>
-		<li ng-repeat="archetype in displayData.archetypes">
-			{{archetype.name}} (<a href="#/multiDeck/{{archetype.archeTypeID}}">{{archetype.count}}</a>)
+		<li ng-repeat="deckType in displayData.deckTypeCount">
+			{{deckType.deckTypeName}} (<a href="#/multiDeck/{{deckType.deckTypeID}}">{{deckType.count}}</a>)
 		</li>
 	</ul>
 </div>

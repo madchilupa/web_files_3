@@ -4,6 +4,7 @@ var dbGrid = require('../dbGrid/dbGridBuilder');
 
 module.exports = function(app) {
     app.get('/gridDisplay', gatherGridData);
+	app.post('/gridSaveRow', saveDataForARow);
 	
 	function gatherGridData(request, response) {
 		var tempObj = dbGrid.createServerObject();
@@ -26,6 +27,22 @@ module.exports = function(app) {
 		
 		function dataDone() {
 			response.send(200, tempObj.returnFinalData());
+		}
+	};
+	
+	function saveDataForARow(request, response) {
+		var newGridObj = dbGrid.createServerObject();
+		console.log(request.body);
+		
+		newGridObj.setGridName(request.body.gridName);
+		/*if (request.body.gridProperties) {
+			newGridObj.setGridProperties(JSON.parse(request.body.gridProperties));
+		}*/
+		
+		newGridObj.findTableAndColumnInformation(saveTheRow);
+		
+		function saveTheRow() {
+			newGridObj.saveGridData(request.body.rowData);
 		}
 	};
 };
