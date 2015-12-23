@@ -91,3 +91,47 @@ angular.module('WebFiles3App')
 			}
 		}
 	});
+
+app.filter('orderObjectByNum', function() {
+  return function(input, attribute) {
+	if (!angular.isObject(input)) {
+		return input;
+	}
+	
+	var array = [];
+	for (var objectKey in input) {
+		if (input.hasOwnProperty(objectKey)) {
+			array.push(input[objectKey]);
+		}
+	}
+		
+	array.sort(function(a, b) {
+		a = parseInt(a[attribute]);
+		b = parseInt(b[attribute]);
+		return a - b;
+	});
+	return array;
+  }
+});
+
+app.filter('orderObjectByString', function() {
+  return function(input, attribute) {
+	if (!angular.isObject(input)) {
+		return input;
+	}
+	
+	var array = [];
+	for (var objectKey in input) {
+		if (input.hasOwnProperty(objectKey)) {
+			array.push(input[objectKey]);
+		}
+	}
+	
+	array.sort(function(a, b) {
+		var alc = a[attribute].toLowerCase(),
+			blc = b[attribute].toLowerCase();
+		return alc > blc ? 1 : alc < blc ? -1 : 0;
+	});
+	return array;
+  }
+});

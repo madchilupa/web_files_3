@@ -7,6 +7,7 @@
 		ad
 	</div>
 	<div class="centerPane" style="width:58%; float:left;">
+		<alert ng-repeat="alert in alerts" type={{alert.type}} close="closeAlert($index)">{{alert.msg}}</alert>
 		<table>
 			<tr>
 				<td>
@@ -29,15 +30,22 @@
 		</table>
 		<br/>
 		
-		<table>
+		<table width="98%" cellpadding="10" cellspacing="10">
 			<tr>
+				<th></th> <!--valid-->
+				<th></th> <!--edit-->
 				<th>Quantity</th>
 				<th>Card Name</th>
 				<th>Edition</th>
-			<tr ng-repeat="card in displayData.cardsFound">
+				<th>Foil?</th>
+			<tr ng-repeat="card in displayData.cardsFound | orderBy:'cardName'">
+				<td ng-if="card.cardInSet == true && card.quantity"><span class="glyphicon glyphicon-ok"></span></td>
+				<td ng-if="card.cardInSet == false || !card.quantity"><span class="glyphicon glyphicon-remove"></span></td>
+				<td><button type="button" class="btn btn-default" ng-click="editRow(displayData.cardsFound.indexOf(card))"><span class="glyphicon glyphicon-pencil"></span></td>
 				<td>{{card.quantity}}</td>
 				<td>{{card.cardName}}</td>
-				<td>{{card.expansion}}</td>
+				<td>{{config.setInfo[card.expansion].setName}} ({{config.setInfo[card.expansion].setAbbr}})</td>
+				<td><input type="checkbox" ng-checked="card.foil" ng-disabled="true" /></td>
 			</tr>
 		</table>
 	</div>

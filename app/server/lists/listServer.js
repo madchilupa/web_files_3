@@ -3,10 +3,51 @@
 var dbase = require('../sqlAnywhere/DatabaseInterface');
 var cardReq = require('../commonObjects/card');
 
-var lineTypeEnum = {};
-lineTypeEnum['CARD'] = 0;
-lineTypeEnum['QUANTITY'] = 1;
-lineTypeEnum['ABBR'] = 2;
+var listConfig = function() {
+	this.setData = {};
+	
+	//database fetch flags
+	this.setInfoLoaded = false;
+	
+	this.dataLoadedCallback = function() {};
+	this.dbErrors = [];
+};
+listConfig.prototype = {};
+
+listConfig.prototype.databaseCallback = function() {
+	if (this.setInfoLoaded) { // && this.otherFlagsLoaded
+		this.dataLoadedCallback();
+	}
+};
+
+listConfig.prototype.getConfig = function() {
+	this.gatherSetData();
+};
+
+listConfig.prototype.gatherSetData = function() {
+	var that = this, cmd = 'SELECT s.ID as setID, s.Name as setName, s.Abbr as setAbbr ' +
+		'FROM dba.Sets s ' +
+		'WHERE s.ActiveFlag = 1; ';
+	
+	dbase.dbResults(cmd, function(databaseData) {
+		that.gatherSetDataCallback(databaseData);
+	});
+};
+
+listConfig.prototype.gatherSetDataCallback = function(databaseData) {
+	if (!databaseData) {
+		this.dbErrors.push('No response from database while retrieving set information.');
+	} else if (databaseData.dbError) {
+		this.dbErrors.push(databaseData.dbError);
+	} else if (databaseData[0]) {
+		//turn data into object by key (setID)
+		for (var i = 0; i < databaseData.length; i++) {
+			this.setData[databaseData[i].setID] = databaseData[i];
+		}
+	}
+	this.setInfoLoaded = true;
+	this.databaseCallback();
+};
 
 var lineTranslation = function () {
 	this.originalText = null;
@@ -18,9 +59,12 @@ var lineTranslation = function () {
 	this.quantity = null;
 	this.card = null;
 	this.setAbbr = null;
+	this.setID = null;
+	this.foil = false;
 	
 	this.setAbbrTested = false;
 	this.cardNamesTested = false;
+	this.relationSetAndCardTested = false;
 	
 	this.TEXTDELIMITER = ' ';
 	
@@ -65,6 +109,10 @@ lineTranslation.prototype.testForQuantity = function() {
 
 lineTranslation.prototype.testForFoil = function() {
 	//TODO: implement. be mindful of the card with name "Foil"
+	var match = this.originalText.search(/foil/i);
+	if (match > -1) {
+		this.foil = true;
+	}
 };
 
 lineTranslation.prototype.testForSetAbbr = function() {
@@ -76,8 +124,6 @@ lineTranslation.prototype.testForSetAbbr = function() {
 		'WHERE s.Abbr in (\'' + wordsAsString + '\') or s.Abbr || \',\' in (\'' + wordsAsString+ '\') ' +
 		'	or CHARINDEX(s.Name, \'' + this.originalText + '\') > 0 ' +
 		'ORDER BY s.Name ASC;';
-	console.log('cmd');
-	console.log(cmd);
 	dbase.dbResults(cmd, function(databaseData) {
 		that.testForSetAbbrCallback(databaseData);
 	});
@@ -95,10 +141,6 @@ lineTranslation.prototype.makeArrayDBSafe = function(array) {
 
 lineTranslation.prototype.testForSetAbbrCallback = function(databaseData) {
 	//Only accepting one set abbreviation at this time
-	console.log('this (lineTranslation) after DB call for testFroSetAbbr');
-	console.log(this);
-	console.log('databaseData testForSetAbbr');
-	console.log(databaseData);
 	if (!databaseData) {
 		this.dbErrors.push('No response from database while looking for set abbreviation.');
 	} else if (databaseData.dbError) {
@@ -108,6 +150,7 @@ lineTranslation.prototype.testForSetAbbrCallback = function(databaseData) {
 	} else {*/
 	} else if (databaseData[0]) {
 		this.setAbbr = databaseData[0].setAbbr;
+		this.setID = databaseData[0].setID;
 	}
 	this.setAbbrTested = true;
 	this.dbTestCallback();
@@ -182,12 +225,39 @@ function slicePartial(oldArray, start, end) {
 
 lineTranslation.prototype.dbTestCallback = function() {
 	if (this.setAbbrTested && this.cardNamesTested) {
-		//TODO: still need to make sure that the card name and set abbr go together (card is actually in the found set)
-		this.card.expansion = this.setAbbr;
-		this.card.quantity = this.quantity;
-		
-		this.translationCompleteCallback(this);
+		if (this.relationSetAndCardTested) {
+			this.card.expansion = this.setID;
+			this.card.quantity = this.quantity;
+			this.card.foil = this.foil;
+			
+			this.translationCompleteCallback(this);
+		} else {
+			this.testSetAndCardRelation();
+		}
 	}
+};
+
+lineTranslation.prototype.testSetAndCardRelation = function() {
+	var that = this, cmd = 'SELECT 1 ' +
+		'FROM dba.Collection col ' +
+		'WHERE col.CardID = \'' + dbase.safeDBString(this.card.cardID) + '\' AND col.SetID = \'' + dbase.safeDBString(this.setID) + '\';';
+	dbase.dbResults(cmd, function(databaseData) {
+		that.testSetAndCardRelationCallback(databaseData);
+	});
+};
+
+lineTranslation.prototype.testSetAndCardRelationCallback = function(databaseData) {
+	if (!databaseData) {
+		this.dbErrors.push('No response from database while testing card and set relationship.');
+	} else if (databaseData.dbError) {
+		this.dbErrors.push(databaseData.dbError);
+	} else if (databaseData[0]) {
+		this.card.cardInSet = true;
+	} else {
+		this.card.cardInSet = false;
+	}
+	this.relationSetAndCardTested = true;
+	this.dbTestCallback();
 };
 
 var listObject = function() {
@@ -277,6 +347,14 @@ listObject.prototype.lineTranslationComplete = function(lineObject) {
 	}
 };
 
+listObject.prototype.configCallback = function(configObj) {
+	if (!configObj.dbErrors || configObj.dbErrors.length < 1) {
+		this.routeCallback({setInfo: configObj.setData});
+	} else {
+		this.routeCallback({dbError: configObj.dbErrors});
+	}
+};
+
 var listObjectData = function() {
 	this.rawText = [];
 	this.cardsFound = [];
@@ -288,6 +366,14 @@ var listObjectPublic = function() {
 	this.listObject = new listObject();
 };
 listObjectPublic.prototype = {};
+
+listObjectPublic.prototype.getConfig = function(routeCallback) {
+	var that = this, config = new listConfig();
+	
+	this.listObject.routeCallback = routeCallback;
+	config.dataLoadedCallback = function() { that.listObject.configCallback(config); };
+	config.getConfig();
+};
 
 listObjectPublic.prototype.setRawText = function(rawText) {
 	this.listObject.data.rawText = rawText;

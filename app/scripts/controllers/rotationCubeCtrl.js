@@ -81,7 +81,7 @@ angular.module('WebFiles3App')
 	};
 	
 	/** Modal for adding a slot **/
-	$scope.addSlotModal = function () {
+	$scope.addSlotModal = function() {
 		var dataToSend = {
 			colors: $scope.meta.colorArray,
 			colorSelected: $scope.meta.colorSelected,
@@ -121,7 +121,7 @@ angular.module('WebFiles3App')
 			}
 		};
 		
-		modalSlotAdd.result.then(function (modalData) {
+		modalSlotAdd.result.then(function(modalData) {
 			//modalData.slots[0].cmc		.name		.type
 			if (modalData && modalData.slots && modalData.slots[0]) {
 				var slotToSave = {
